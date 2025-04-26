@@ -1,4 +1,17 @@
-<div class="container mt-5">
-  <h2>Home Page</h2>
-  <p>Welcome to the Home Page!</p>
+<div class="d-flex flex-column justify-content-center align-items-center vh-100">
+  <h1 class="mb-5">Welcome to the Task Manager!</h1>
+
+  <div class="d-flex gap-5">
+    <button (click)="goToCategories()" class="btn btn-primary btn-lg px-5 py-3">
+      Kategorie
+    </button>
+
+    <button (click)="goToTasks()" class="btn btn-success btn-lg px-5 py-3">
+      Taski
+    </button>
+  </div>
+
+  <button (click)="logout()" class="btn btn-outline-danger mt-5">
+    Wyloguj
+  </button>
 </div>

@@ -1,0 +1,21 @@
+<table>
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Category</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let task of tasks">
+    <td>{{ task.title }}</td>
+    <td>{{ task.description }}</td>
+    <td>{{ task.categoryName }}</td>
+    <td>
+      <button (click)="editTask(task)">Edit</button>
+      <button (click)="deleteTask(task.id)">Delete</button>
+    </td>
+  </tr>
+  </tbody>
+</table>

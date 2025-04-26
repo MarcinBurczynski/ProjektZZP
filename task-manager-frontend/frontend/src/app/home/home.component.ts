@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -6,5 +7,19 @@ import { Component } from '@angular/core';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
-  // Możesz dodać kod, który będzie wyświetlał dane użytkownika po zalogowaniu
+
+  constructor(private router: Router) {}
+
+  logout() {
+    localStorage.removeItem('authToken');
+    this.router.navigate(['/']);
+  }
+
+  goToCategories() {
+    this.router.navigate(['/categories']);
+  }
+
+  goToTasks() {
+    this.router.navigate(['/tasks']);
+  }
 }

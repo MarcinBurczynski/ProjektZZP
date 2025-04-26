@@ -3,6 +3,7 @@ package org.example.controller;
 import org.example.dto.TaskDTO;
 import org.example.entity.User;
 import org.example.service.TaskService;
+import org.example.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -14,37 +15,34 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
+    private final UserService userService;
 
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, UserService userService) {
         this.taskService = taskService;
+        this.userService = userService;
     }
 
     @GetMapping
     public List<TaskDTO> listTasks(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = getUserFromDetails(userDetails);
+        User user = userService.getUserFromDetails(userDetails);
         return taskService.getTasksForUser(user);
     }
 
     @PostMapping
     public TaskDTO createTask(@AuthenticationPrincipal UserDetails userDetails, @RequestBody TaskDTO taskDTO) {
-        User user = getUserFromDetails(userDetails);
+        User user = userService.getUserFromDetails(userDetails);
         return taskService.createTask(user, taskDTO);
     }
 
     @PutMapping("/{id}")
     public void updateTask(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id, @RequestBody TaskDTO taskDTO) {
-        User user = getUserFromDetails(userDetails);
+        User user = userService.getUserFromDetails(userDetails);
         taskService.updateTask(id, user, taskDTO);
     }
 
     @DeleteMapping("/{id}")
     public void deleteTask(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id) {
-        User user = getUserFromDetails(userDetails);
+        User user = userService.getUserFromDetails(userDetails);
         taskService.deleteTask(id, user);
-    }
-
-    private User getUserFromDetails(UserDetails userDetails) {
-        // W tym miejscu musisz pobrać użytkownika na podstawie username
-        return new User(); // Placeholder do pobierania użytkownika
     }
 }

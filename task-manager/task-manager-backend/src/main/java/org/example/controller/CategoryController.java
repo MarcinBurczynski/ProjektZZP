@@ -1,6 +1,6 @@
 package org.example.controller;
 
-import org.example.entity.Category;
+import org.example.dto.CategoryDTO;
 import org.example.entity.User;
 import org.example.service.CategoryService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -15,22 +16,26 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    // KONSTRUKTOR
+    // Konstruktor
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
     @GetMapping
-    public List<Category> listCategories(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = getUserFromDetails(userDetails); // metoda pomocnicza
-        return categoryService.getCategoriesForUser(user);
+    public List<CategoryDTO> listCategories(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = getUserFromDetails(userDetails);
+        return categoryService.getCategoriesForUser(user)
+                .stream()
+                .map(category -> new CategoryDTO(category.getId(), category.getName()))
+                .collect(Collectors.toList());
     }
 
     @PostMapping
-    public Category createCategory(@AuthenticationPrincipal UserDetails userDetails,
-                                   @RequestParam String name) {
+    public CategoryDTO createCategory(@AuthenticationPrincipal UserDetails userDetails,
+                                      @RequestParam String name) {
         User user = getUserFromDetails(userDetails);
-        return categoryService.createCategory(user, name);
+        var category = categoryService.createCategory(user, name);
+        return new CategoryDTO(category.getId(), category.getName());
     }
 
     @DeleteMapping("/{id}")
@@ -41,8 +46,8 @@ public class CategoryController {
     }
 
     private User getUserFromDetails(UserDetails userDetails) {
-        // TODO: W prawdziwym projekcie tutaj pobierasz User po username
-        return new User(); // TEMP: Tu musisz podmienić na prawdziwe pobieranie usera z bazy
+        // Pobierz użytkownika na podstawie username
+        return new User(); // TODO: Zaimplementuj odpowiednią metodę
     }
 }
 

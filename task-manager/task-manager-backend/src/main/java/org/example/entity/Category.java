@@ -21,17 +21,14 @@ public class Category {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Konstruktor bezargumentowy
     public Category() {
     }
 
-    // Konstruktor z wszystkimi polami
     public Category(String name, User user) {
         this.name = name;
         this.user = user;
     }
 
-    // Gettery i Settery
     public Long getId() {
         return id;
     }

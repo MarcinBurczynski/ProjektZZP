@@ -5,13 +5,11 @@ public class CategoryDTO {
     private Long id;
     private String name;
 
-    // Konstruktor
     public CategoryDTO(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    // Gettery i Settery
     public Long getId() {
         return id;
     }

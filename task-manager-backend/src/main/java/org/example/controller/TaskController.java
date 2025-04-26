@@ -32,13 +32,13 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public void updateTask(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long id, @RequestBody TaskDTO taskDTO) {
+    public void updateTask(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id, @RequestBody TaskDTO taskDTO) {
         User user = getUserFromDetails(userDetails);
         taskService.updateTask(id, user, taskDTO);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTask(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long id) {
+    public void deleteTask(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id) {
         User user = getUserFromDetails(userDetails);
         taskService.deleteTask(id, user);
     }

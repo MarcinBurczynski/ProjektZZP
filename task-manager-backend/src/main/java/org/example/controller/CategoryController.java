@@ -24,7 +24,6 @@ public class CategoryController {
     public CategoryController(CategoryService categoryService, UserService userService) {
         this.categoryService = categoryService;
         this.userService = userService;
-
     }
 
     @GetMapping

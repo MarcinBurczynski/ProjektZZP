@@ -20,52 +20,23 @@
     </changeSet>
 
     <changeSet id="2" author="admin">
-        <insert tableName="user_data">
-            <column name="id" value="10000" />
-            <column name="username" value="admin"/>
-            <column name="password" value="$2a$10$X9i.jmttu0qN.eQhPEbAoe2y2jWsGW0VfSQxKDNJUDy5jNTJzqWZG"/>
-        </insert>
-    </changeSet>
-
-    <changeSet id="add-category-table" author="admin">
-        <createTable tableName="category">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="user_id" type="VARCHAR(255)">
-                <constraints nullable="false" />
-            </column>
-        </createTable>
-    </changeSet>
-
-    <changeSet id="spadaj" author="admin">
-        <insert tableName="category">
-            <column name="id" valueNumeric="10000"/>
-            <column name="name" value="Category A"/>
-            <column name="user_id" value="10000" />
-        </insert>
-        <insert tableName="category">
-            <column name="id" valueNumeric="10001"/>
-            <column name="name" value="Category B"/>
-            <column name="user_id" value="10000" />
-        </insert>
-    </changeSet>
-
-    <changeSet id="huasd" author="admin">
         <addAutoIncrement tableName="user_data"
                           columnName="id"
                           columnDataType="BIGINT"/>
     </changeSet>
 
-    <changeSet id="autoee" author="admin">
-        <addAutoIncrement tableName="category"
-                          columnName="id"
-                          columnDataType="BIGINT"/>
+    <changeSet id="3" author="admin">
+        <insert tableName="user_data">
+            <column name="id" value="10000"/>
+            <column name="username" value="admin"/>
+            <column name="password" value="$2a$10$X9i.jmttu0qN.eQhPEbAoe2y2jWsGW0VfSQxKDNJUDy5jNTJzqWZG"/>
+        </insert>
+        <insert tableName="user_data">
+            <column name="id" value="10001"/>
+            <column name="username" value="admin2"/>
+            <column name="password" value="$2a$10$X9i.jmttu0qN.eQhPEbAoe2y2jWsGW0VfSQxKDNJUDy5jNTJzqWZG"/>
+        </insert>
     </changeSet>
-
 
 
 </databaseChangeLog>

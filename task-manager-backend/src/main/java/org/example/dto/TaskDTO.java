@@ -1,17 +1,19 @@
 package org.example.dto;
 
+import org.example.entity.Status;
+
 public class TaskDTO {
 
     private Long id;
     private String title;
     private String description;
-    private String status;
+    private Status status;
     private Long categoryId;
     private Long userId;
 
     public TaskDTO() {}
 
-    public TaskDTO(Long id, String title, String description, String status, Long categoryId, Long userId) {
+    public TaskDTO(Long id, String title, String description, Status status, Long categoryId, Long userId) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -44,11 +46,11 @@ public class TaskDTO {
         this.description = description;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

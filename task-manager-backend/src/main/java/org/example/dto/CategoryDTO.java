@@ -12,6 +12,10 @@ public class CategoryDTO {
         this.id = id;
         this.name = name;
     }
+    public CategoryDTO(CategoryDTO dto) {
+        this.id = dto.getId();
+        this.name = dto.getName();
+    }
 
     // Gettery i Settery
     public Long getId() {

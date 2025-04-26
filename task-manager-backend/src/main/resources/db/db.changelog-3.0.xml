@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="7" author="admin">
+        <createTable tableName="task">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="8" author="admin">
+        <addAutoIncrement tableName="task"
+                          columnName="id"
+                          columnDataType="BIGINT"/>
+    </changeSet>
+
+    <changeSet id="9" author="admin">
+        <insert tableName="task">
+            <column name="id" valueNumeric="10000"/>
+            <column name="title" value="Zadanie 1"/>
+            <column name="description" value="opis zadania 1"/>
+            <column name="status" value="NEW"/>
+            <column name="user_id" value="10000"/>
+            <column name="category_id" value="10000"/>
+        </insert>
+        <insert tableName="task">
+            <column name="id" valueNumeric="10001"/>
+            <column name="title" value="Zadanie 2"/>
+            <column name="description" value="opis zadania 2"/>
+            <column name="status" value="IN_PROGRESS"/>
+            <column name="user_id" value="10000"/>
+            <column name="category_id" value="10000"/>
+        </insert>
+        <insert tableName="task">
+            <column name="id" valueNumeric="10002"/>
+            <column name="title" value="Zadanie 3"/>
+            <column name="description" value="opis zadania 3"/>
+            <column name="status" value="IN_PROGRESS"/>
+            <column name="user_id" value="10000"/>
+            <column name="category_id" value="10001"/>
+        </insert>
+        <insert tableName="task">
+            <column name="id" valueNumeric="10003"/>
+            <column name="title" value="Zadanie 4"/>
+            <column name="description" value="opis zadania 4"/>
+            <column name="status" value="IN_PROGRESS"/>
+            <column name="user_id" value="10001"/>
+            <column name="category_id" value="10002"/>
+        </insert>
+        <insert tableName="task">
+            <column name="id" valueNumeric="10004"/>
+            <column name="title" value="Zadanie 5"/>
+            <column name="description" value="opis zadania 5"/>
+            <column name="status" value="COMPLETED"/>
+            <column name="user_id" value="10001"/>
+            <column name="category_id" value="10002"/>
+        </insert>
+
+    </changeSet>
+
+
+
+
+
+</databaseChangeLog>

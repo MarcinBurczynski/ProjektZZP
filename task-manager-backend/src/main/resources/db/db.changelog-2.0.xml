@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="4" author="admin">
+        <createTable tableName="category">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="5" author="admin">
+        <addAutoIncrement tableName="category"
+                          columnName="id"
+                          columnDataType="BIGINT"/>
+    </changeSet>
+
+    <changeSet id="6" author="admin">
+        <insert tableName="category">
+            <column name="id" valueNumeric="10000"/>
+            <column name="name" value="Category A"/>
+            <column name="user_id" value="10000"/>
+        </insert>
+        <insert tableName="category">
+            <column name="id" valueNumeric="10001"/>
+            <column name="name" value="Category B"/>
+            <column name="user_id" value="10000"/>
+        </insert>
+        <insert tableName="category">
+            <column name="id" valueNumeric="10002"/>
+            <column name="name" value="Category C"/>
+            <column name="user_id" value="10001"/>
+        </insert>
+        <insert tableName="category">
+            <column name="id" valueNumeric="10003"/>
+            <column name="name" value="Category D"/>
+            <column name="user_id" value="10001"/>
+        </insert>
+    </changeSet>
+
+
+
+
+
+</databaseChangeLog>

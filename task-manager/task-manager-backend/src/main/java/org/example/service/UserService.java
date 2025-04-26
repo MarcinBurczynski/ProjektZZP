@@ -50,6 +50,11 @@ public class UserService {
         User user = new User();
         user.setUsername(userOperationDTO.getUsername());
 
+        User existingUser = userRepository.findByUsername(userOperationDTO.getUsername()).orElse(null);
+        if (existingUser != null) {
+            throw new RuntimeException("Existing user with this username");
+        }
+
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(userOperationDTO.getPassword());
 
@@ -81,6 +86,15 @@ public class UserService {
         }
 
         return userDTOs;
+    }
+
+    public User findByUsername(String username) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            return null;
+        }
+        User user = userOptional.get();
+        return user;
     }
 }
 

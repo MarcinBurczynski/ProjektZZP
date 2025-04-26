@@ -5,6 +5,8 @@ public class CategoryDTO {
     private Long id;
     private String name;
 
+    public CategoryDTO() {
+    }
     // Konstruktor
     public CategoryDTO(Long id, String name) {
         this.id = id;

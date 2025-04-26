@@ -1,8 +1,11 @@
 package org.example.controller;
 
 import org.example.dto.CategoryDTO;
+import org.example.dto.UserDTO;
 import org.example.entity.User;
 import org.example.service.CategoryService;
+import org.example.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +18,13 @@ import java.util.stream.Collectors;
 public class CategoryController {
 
     private final CategoryService categoryService;
-
+    private final UserService userService;
     // Konstruktor
-    public CategoryController(CategoryService categoryService) {
+    @Autowired
+    public CategoryController(CategoryService categoryService, UserService userService) {
         this.categoryService = categoryService;
+        this.userService = userService;
+
     }
 
     @GetMapping
@@ -32,22 +38,36 @@ public class CategoryController {
 
     @PostMapping
     public CategoryDTO createCategory(@AuthenticationPrincipal UserDetails userDetails,
-                                      @RequestParam String name) {
+                                      @RequestParam("name") String name) {
         User user = getUserFromDetails(userDetails);
         var category = categoryService.createCategory(user, name);
         return new CategoryDTO(category.getId(), category.getName());
     }
 
+    @GetMapping("/{id}")
+    public CategoryDTO getCategory(@AuthenticationPrincipal UserDetails userDetails,
+                               @PathVariable("id") Long id) {
+        User user = getUserFromDetails(userDetails);
+        return categoryService.getCategoryByIdAndUser(user, id);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteCategory(@AuthenticationPrincipal UserDetails userDetails,
-                               @PathVariable Long id) {
+                               @PathVariable("id") Long id) {
         User user = getUserFromDetails(userDetails);
         categoryService.deleteCategory(id, user);
     }
 
     private User getUserFromDetails(UserDetails userDetails) {
-        // Pobierz użytkownika na podstawie username
-        return new User(); // TODO: Zaimplementuj odpowiednią metodę
+
+        User user = userService.findByUsername(userDetails.getUsername());
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        return user;
     }
+
 }
 

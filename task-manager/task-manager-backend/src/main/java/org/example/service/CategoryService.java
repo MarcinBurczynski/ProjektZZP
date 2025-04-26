@@ -1,10 +1,12 @@
 package org.example.service;
 
+import org.example.dto.UserDTO;
 import org.example.entity.Category;
 import org.example.entity.User;
 import org.example.dto.CategoryDTO;
 import org.example.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -17,6 +19,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    @Autowired
     public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
@@ -26,6 +29,17 @@ public class CategoryService {
                 .stream()
                 .map(category -> new CategoryDTO(category.getId(), category.getName()))
                 .collect(Collectors.toList());
+    }
+
+    public CategoryDTO getCategoryByIdAndUser(User user, Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+
+        if (!category.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("You don't have access to this category");
+        }
+
+        return new CategoryDTO(category.getId(), category.getName());
     }
 
     @Transactional

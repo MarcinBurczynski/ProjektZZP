@@ -1,0 +1,61 @@
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card shadow-sm" style="width: 100%; max-width: 400px;">
+    <div class="card-header text-center">
+      <h3 class="text-primary">Login</h3>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="login()" #loginForm="ngForm">
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input
+            type="text"
+            id="username"
+            class="form-control"
+            name="username"
+            [(ngModel)]="username"
+            required
+            #usernameInput="ngModel"
+          />
+          <div *ngIf="usernameInput.invalid && usernameInput.touched" class="text-danger">
+            Username is required.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input
+            type="password"
+            id="password"
+            class="form-control"
+            name="password"
+            [(ngModel)]="password"
+            required
+            #passwordInput="ngModel"
+          />
+          <div *ngIf="passwordInput.invalid && passwordInput.touched" class="text-danger">
+            Password is required.
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm.invalid">
+          Log In
+        </button>
+      </form>
+    </div>
+    <div class="card-footer text-center">
+      <small>
+        Don't have an account?
+        <a (click)="navigateToRegister()" style="cursor: pointer;">Sign up</a>
+      </small>
+
+    </div>
+  </div>
+
+  <!-- Modal for error message -->
+  <div *ngIf="showError" class="modal" style="display: block;">
+    <div class="modal-content">
+      <span class="close" (click)="closeModal()">&times;</span>
+      <p>{{ errorMessage }}</p>
+    </div>
+  </div>
+</div>

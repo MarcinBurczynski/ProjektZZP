@@ -4,18 +4,21 @@ import org.example.entity.Category;
 import org.example.entity.User;
 import org.example.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Validated
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+
+    // KONSTRUKTOR
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
 
     public List<Category> getCategoriesForUser(User user) {
         return categoryRepository.findAllByUser(user);
@@ -44,4 +47,3 @@ public class CategoryService {
         categoryRepository.delete(category);
     }
 }
-

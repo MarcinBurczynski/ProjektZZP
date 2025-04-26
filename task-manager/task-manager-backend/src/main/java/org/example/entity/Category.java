@@ -2,14 +2,8 @@ package org.example.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
 @Table(
         name = "category",
         uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "name"})
@@ -26,4 +20,40 @@ public class Category {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    // Konstruktor bezargumentowy
+    public Category() {
+    }
+
+    // Konstruktor z wszystkimi polami
+    public Category(String name, User user) {
+        this.name = name;
+        this.user = user;
+    }
+
+    // Gettery i Settery
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
+

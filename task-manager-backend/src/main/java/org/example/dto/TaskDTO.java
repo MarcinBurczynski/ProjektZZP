@@ -9,6 +9,8 @@ public class TaskDTO {
     private Long categoryId;
     private Long userId;
 
+    public TaskDTO() {}
+
     public TaskDTO(Long id, String title, String description, String status, Long categoryId, Long userId) {
         this.id = id;
         this.title = title;

@@ -8,7 +8,7 @@ import { routes } from './app.routes';
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes, withDebugTracing(), withRouterConfig({ paramsInheritanceStrategy: 'always' })),
-    provideHttpClient(withFetch())  // Dodajemy konfigurację fetch (opcjonalne)
+    provideHttpClient(withFetch())
   ]
 })
   .catch(err => console.error(err));

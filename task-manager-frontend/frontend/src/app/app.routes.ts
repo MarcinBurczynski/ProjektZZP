@@ -8,8 +8,8 @@ import { CategoryListComponent } from './categories/category-list/category-list.
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
-  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] }, // Chronienie strony home
+  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'register', component: RegisterComponent},
-  { path: 'categories', component: CategoryListComponent },
-  //{ path: 'tasks', component: TasksComponent },
+  { path: 'categories', component: CategoryListComponent, canActivate: [AuthGuard] },
+  // { path: 'tasks', component: TasksComponent },
 ];

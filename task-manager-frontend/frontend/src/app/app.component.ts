@@ -1,16 +1,13 @@
 import { Component } from '@angular/core';
-import {RouterOutlet} from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  imports: [
-    RouterOutlet
-  ],
-  styleUrls: ['./app.component.css']
+  imports: [RouterOutlet],
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  // Możesz dodać logikę do wykrywania, czy użytkownik jest zalogowany
   ngOnInit() {
     const token = localStorage.getItem('authToken');
     if (!token) {

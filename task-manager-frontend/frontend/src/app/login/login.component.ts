@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; // <-- Dodaj import Routera
+import { Router } from '@angular/router';
+import apiClient from '../../environments/axios';
 
 @Component({
   selector: 'app-login',
@@ -16,40 +17,35 @@ export class LoginComponent {
   showError: boolean = false;
   errorMessage: string = '';
 
-  constructor(private router: Router) {} // <-- Inject router w konstruktorze
+  constructor(private router: Router) {}
 
   async login() {
     if (this.username && this.password) {
-      const loginData = { username: this.username, password: this.password };
-
       try {
-        const response = await fetch('http://localhost:8080/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(loginData),
+        const response = await apiClient.post('/login', {
+          username: this.username,
+          password: this.password,
         });
 
-        if (response.ok) {
-          const token = await response.text();
-          console.log('Logged in successfully, token:', token);
+        if (response.status === 200) {
+          const token = await response.data.token;
           localStorage.setItem('authToken', token);
-
           this.router.navigate(['/home']);
         } else {
           this.showError = true;
-          this.errorMessage = 'Invalid username or password. Please try again.';
+          this.errorMessage =
+            'Niepoprawna nazwa użytkownika lub hasło. Spróbuj ponownie.';
           console.error('Login failed:', response.status);
         }
       } catch (error) {
         this.showError = true;
-        this.errorMessage = 'An error occurred during login. Please try again later.';
+        this.errorMessage =
+          'Wystąpił problem podczas próby logowania. Proszę spróbuj ponownie.';
         console.error('Error occurred during login:', error);
       }
     } else {
       this.showError = true;
-      this.errorMessage = 'Both fields are required.';
+      this.errorMessage = 'Oba pola są wymagane.';
     }
   }
 

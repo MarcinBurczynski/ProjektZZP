@@ -1,0 +1,15 @@
+ .card-body {
+    padding: 2rem;
+  }
+  
+  .btn-outline-primary,
+  .btn-outline-success {
+    border-width: 2px;
+  }
+  
+  @media (max-width: 767px) {
+    .card-body {
+      padding: 1rem;
+    }
+  }
+  

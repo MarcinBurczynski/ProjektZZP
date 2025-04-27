@@ -7,8 +7,15 @@ const apiClient = axios.create({
   },
 });
 
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+}
+
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = getCookie('jwt_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

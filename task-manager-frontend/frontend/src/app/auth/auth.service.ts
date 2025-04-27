@@ -1,30 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import apiClient from '../../environments/axios';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private http: HttpClient) {}
-
-  login(username: string, password: string): Observable<any> {
-    const credentials = { username, password };
-    return this.http.post<any>(environment.apiUrl + 'login', credentials);
-  }
+  constructor(private cookieService: CookieService) {}
 
   saveToken(token: string): void {
-    localStorage.setItem('token', token);
+    this.cookieService.set('jwt_token', token, 1, '/', 'localhost', false, 'Strict');
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return this.cookieService.get('jwt_token');
   }
 
   removeToken(): void {
-    localStorage.removeItem('token');
+    this.cookieService.delete('jwt_token', '/');
   }
 
   isLoggedIn(): boolean {

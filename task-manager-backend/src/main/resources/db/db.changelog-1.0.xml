@@ -16,6 +16,9 @@
             <column name="password" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="role" type="bigint">
                 <constraints nullable="false"/>
             </column>
@@ -33,18 +36,21 @@
             <column name="id" value="10000"/>
             <column name="username" value="admin"/>
             <column name="password" value="$2a$10$X9i.jmttu0qN.eQhPEbAoe2y2jWsGW0VfSQxKDNJUDy5jNTJzqWZG"/>
+            <column name="email" value="admin@example.com"/>
             <column name="role" value="0"/>
         </insert>
         <insert tableName="user_data">
             <column name="id" value="10001"/>
             <column name="username" value="moderator"/>
             <column name="password" value="$2a$10$X9i.jmttu0qN.eQhPEbAoe2y2jWsGW0VfSQxKDNJUDy5jNTJzqWZG"/>
+            <column name="email" value="moderator@example.com"/>
             <column name="role" value="1"/>
         </insert>
         <insert tableName="user_data">
             <column name="id" value="10002"/>
             <column name="username" value="user"/>
             <column name="password" value="$2a$10$X9i.jmttu0qN.eQhPEbAoe2y2jWsGW0VfSQxKDNJUDy5jNTJzqWZG"/>
+            <column name="email" value="user@example.com"/>
             <column name="role" value="2"/>
         </insert>
     </changeSet>

@@ -7,6 +7,7 @@ public class UserOperationDTO {
     private Long id;
     private String username;
     private String password;
+    private String email;
     private String role;
 
     public UserOperationDTO() {
@@ -17,6 +18,7 @@ public class UserOperationDTO {
         this.username = u.getUsername();
         this.password = u.getPassword();
         this.role = u.getRole().toString();
+        this.email = u.getEmail();
     }
 
     public String getPassword() {
@@ -49,5 +51,13 @@ public class UserOperationDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

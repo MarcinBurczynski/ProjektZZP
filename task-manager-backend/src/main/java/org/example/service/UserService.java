@@ -7,6 +7,8 @@ import org.example.dto.UserOperationDTO;
 import org.example.entity.User;
 import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,10 +21,12 @@ import java.util.Optional;
 public class UserService implements org.springframework.security.core.userdetails.UserDetailsService{
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, EmailService emailService) {
         this.userRepository = userRepository;
+        this.emailService = emailService;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
@@ -39,7 +43,7 @@ public class UserService implements org.springframework.security.core.userdetail
         }
 
         JwtUtils jwtUtils = new JwtUtils();
-        return new PermissionDTO(user.getRole(),jwtUtils.generateToken(user));
+        return new PermissionDTO(user.getId(),user.getRole(),jwtUtils.generateToken(user));
     }
 
     public PermissionDTO register(UserOperationDTO userOperationDTO) {
@@ -50,11 +54,13 @@ public class UserService implements org.springframework.security.core.userdetail
 
         String encodedPassword = passwordEncoder.encode(userOperationDTO.getPassword());
 
-        User user = new User(userOperationDTO.getUsername(),encodedPassword,userOperationDTO.getRole());
+        User user = new User(userOperationDTO.getUsername(),encodedPassword,userOperationDTO.getEmail(),userOperationDTO.getRole());
         userRepository.save(user);
 
+        emailService.sendSimpleMessage(userOperationDTO.getEmail(), "Witaj!", "Dziękujemy za rejestrację w serwisie Taskero!!!");
+
         JwtUtils jwtUtils = new JwtUtils();
-        return new PermissionDTO(user.getRole(),jwtUtils.generateToken(user));
+        return new PermissionDTO(user.getId(),user.getRole(),jwtUtils.generateToken(user));
     }
 
     public UserDTO createUser(User permUser,UserOperationDTO userOperationDTO) {
@@ -62,7 +68,7 @@ public class UserService implements org.springframework.security.core.userdetail
             throw new SecurityException("You can't create users!!!");
         }
         String encodedPassword = passwordEncoder.encode(userOperationDTO.getPassword());
-        User user = new User(userOperationDTO.getUsername(), encodedPassword, userOperationDTO.getRole());
+        User user = new User(userOperationDTO.getUsername(), encodedPassword,userOperationDTO.getEmail(), userOperationDTO.getRole());
         user = userRepository.save(user);
         return new UserDTO(user);
     }
@@ -90,6 +96,7 @@ public class UserService implements org.springframework.security.core.userdetail
         String encodedPassword = passwordEncoder.encode(userOperationDTO.getPassword());
         user.setUsername(userOperationDTO.getUsername());
         user.setPassword(encodedPassword);
+        user.setEmail(userOperationDTO.getEmail());
         user.setRole(userOperationDTO.getRole());
         userRepository.save(user);
     }

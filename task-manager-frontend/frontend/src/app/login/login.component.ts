@@ -49,8 +49,11 @@ export class LoginComponent {
           password: this.loginPassword,
         });
         if(response.status === 200) {
-            const token = await response.data;
+            const token = await response.data.jwt;
+            const role = await response.data.role;
             this.authService.saveToken(token);
+            this.authService.saveRole(role);
+            this.authService.saveUsername(this.loginUsername);
             this.router.navigate(['/home']);
         } else {
             this.showError = true;

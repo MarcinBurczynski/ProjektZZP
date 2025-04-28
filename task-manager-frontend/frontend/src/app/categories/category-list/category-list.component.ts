@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import apiClient from '../../../environments/axios';
+import { fetchCategories } from '../../../utils/fetching_helper';
+import { Category } from '../../../utils/interfaces';
 
 @Component({
   selector: 'app-category-list',
@@ -10,24 +11,11 @@ import apiClient from '../../../environments/axios';
   imports: [CommonModule],
 })
 export class CategoryListComponent implements OnInit {
-  categories: any[] = [];
+  categories: Category[] = [];
 
   constructor() {}
 
   ngOnInit() {
-    this.fetchCategories();
-  }
-
-  async fetchCategories() {
-    try {
-      const response = await apiClient.get('/api/categories');
-      if (response.status === 200) {
-        this.categories = response.data;
-      } else {
-        console.error('Failed to fetch categories:', response.status);
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
+    fetchCategories().then(categories => this.categories = categories);
   }
 }

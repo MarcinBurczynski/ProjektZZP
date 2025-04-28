@@ -25,3 +25,24 @@
   font-size: 20px;
   cursor: pointer;
 }
+
+.card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-tab {
+  transition: all 0.3s ease-in-out;
+  border-radius: 0;
+}
+
+.card-tab:hover {
+  background-color: #f2f2f2;
+}
+
+.card-tab.active-tab {
+  background-color: #f2f2f2;
+}
+
+.card-tab:not(.active-tab) {
+  background-color: #fff;
+}

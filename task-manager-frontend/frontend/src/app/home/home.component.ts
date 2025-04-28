@@ -8,12 +8,18 @@ import { AuthService } from '../auth/auth.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
-
   constructor(private router: Router, private authService: AuthService) {}
 
+  role: string | null = '';
+  username: string | null = '';
+
+  ngOnInit() {
+    this.role = this.authService.getRole();
+    this.username = this.authService.getUsername();
+  }
+
   logout() {
-    this.authService.removeToken();
-    this.router.navigate(['/']);
+    this.authService.logout();
   }
 
   goToCategories() {

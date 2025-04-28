@@ -1,8 +1,8 @@
 <div class="container px-0">
   <div class="d-flex justify-content-between align-items-center p-3">
     <div>
-      <p class="mb-0">Nazwa użytkownika: <strong>admin</strong></p>
-      <p class="mb-0">Rola: <strong>Admin</strong></p>
+      <p class="mb-0">Nazwa użytkownika: <strong>{{ username }}</strong></p>
+      <p class="mb-0">Rola: <strong>{{ role }}</strong></p>
     </div>
     <button (click)="logout()" class="btn btn-outline-danger">
       Wyloguj

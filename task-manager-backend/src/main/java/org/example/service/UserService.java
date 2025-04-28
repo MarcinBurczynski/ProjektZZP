@@ -1,96 +1,131 @@
 package org.example.service;
 
 import org.example.config.JwtUtils;
+import org.example.dto.PermissionDTO;
 import org.example.dto.UserDTO;
 import org.example.dto.UserOperationDTO;
 import org.example.entity.User;
 import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+public class UserService implements org.springframework.security.core.userdetails.UserDetailsService{
     private final UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    public String login(UserOperationDTO userOperationDTO) {
-
+    public PermissionDTO login(UserOperationDTO userOperationDTO) {
         Optional<User> userOptional = userRepository.findByUsername(userOperationDTO.getUsername());
         if (userOptional.isEmpty()) {
-            throw new RuntimeException("User not found");
+            throw new RuntimeException("Invalid login or password");
         }
 
         User user = userOptional.get();
 
         if (!passwordEncoder.matches(userOperationDTO.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new RuntimeException("Invalid login or password");
         }
 
         JwtUtils jwtUtils = new JwtUtils();
-        String token = jwtUtils.generateToken(user.getUsername());
-
-        return token;
+        return new PermissionDTO(user.getRole(),jwtUtils.generateToken(user));
     }
 
-    public void register(UserOperationDTO userOperationDTO) {
-        User user = new User();
-        user.setUsername(userOperationDTO.getUsername());
-
+    public PermissionDTO register(UserOperationDTO userOperationDTO) {
         User existingUser = userRepository.findByUsername(userOperationDTO.getUsername()).orElse(null);
         if (existingUser != null) {
             throw new RuntimeException("Existing user with this username");
         }
 
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String encodedPassword = encoder.encode(userOperationDTO.getPassword());
+        String encodedPassword = passwordEncoder.encode(userOperationDTO.getPassword());
 
-        user.setPassword(encodedPassword);
+        User user = new User(userOperationDTO.getUsername(),encodedPassword,userOperationDTO.getRole());
         userRepository.save(user);
+
+        JwtUtils jwtUtils = new JwtUtils();
+        return new PermissionDTO(user.getRole(),jwtUtils.generateToken(user));
     }
 
-    public UserDTO getUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    public UserDTO createUser(User permUser,UserOperationDTO userOperationDTO) {
+        if(permUser.getRole().ordinal()>0){
+            throw new SecurityException("You can't create users!!!");
+        }
+        String encodedPassword = passwordEncoder.encode(userOperationDTO.getPassword());
+        User user = new User(userOperationDTO.getUsername(), encodedPassword, userOperationDTO.getRole());
+        user = userRepository.save(user);
         return new UserDTO(user);
     }
 
-    public void saveUser(UserOperationDTO userOperationDTO) {
-        User user = new User(userOperationDTO.getUsername(), userOperationDTO.getPassword());
+    public void updateUser(User permUser,UserOperationDTO userOperationDTO) {
+        if(!permUser.getId().equals(userOperationDTO.getId()) && permUser.getRole().ordinal()>0){
+            throw new SecurityException("You can't update other users!!!");
+        }
+        if(permUser.getId().equals(userOperationDTO.getId()) && !permUser.getRole().equals(userOperationDTO.getRole())){
+            throw new SecurityException("You can't change your privileges!!!");
+        }
+
+        userRepository.findByUsername(userOperationDTO.getUsername()).ifPresent(u ->{
+            if(!userOperationDTO.getId().equals(u.getId())){
+                throw new IllegalArgumentException("Given username is already taken!!!");
+            }
+        });
+
+        Optional<User> optionalUser = userRepository.findById(userOperationDTO.getId());
+        if(optionalUser.isEmpty()){
+            throw new RuntimeException("User not found");
+        }
+        User user = optionalUser.get();
+
+        String encodedPassword = passwordEncoder.encode(userOperationDTO.getPassword());
+        user.setUsername(userOperationDTO.getUsername());
+        user.setPassword(encodedPassword);
+        user.setRole(userOperationDTO.getRole());
         userRepository.save(user);
     }
 
-    public void deleteUser(Long id) {
+    public void deleteUser(User permUser,Long id) {
+        if(permUser.getRole().ordinal()>0){
+            throw new SecurityException("You can't delete users!!!");
+        }
         userRepository.deleteById(id);
     }
 
-    public List<UserDTO> getUsers() {
-        List<User> users = userRepository.findAll();
-        List<UserDTO> userDTOs = new ArrayList<>();
-
-        for (User user : users) {
-            UserDTO userDTO = new UserDTO(user);
-            userDTOs.add(userDTO);
-        }
-
-        return userDTOs;
+    public UserDTO getUserById(User permUser,Long id) {
+        return new UserDTO(getUserObjectById(permUser,id));
     }
 
-    public User getUserFromDetails(UserDetails userDetails) {
+    public User getUserObjectById(User permUser,Long id) {
+        if(!permUser.getId().equals(id) && permUser.getRole().ordinal()>1){
+            throw new SecurityException("You can't view given user!!!");
+        }
 
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    public List<UserDTO> getUsers(User permUser) {
+        if(permUser.getRole().ordinal()>1){
+            throw new SecurityException("You can't view users!!!");
+        }
+
+        return userRepository.findAll()
+            .stream()
+            .map(UserDTO::new)
+            .toList();
+    }
+
+    //authorization methods
+    public User getUserFromDetails(UserDetails userDetails) {
         Optional<User> userOptional = userRepository.findByUsername(userDetails.getUsername());
 
         if (userOptional.isEmpty()) {
@@ -98,6 +133,18 @@ public class UserService {
         }
 
         return userOptional.get();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        return org.springframework.security.core.userdetails.User.builder()
+            .username(user.getUsername())
+            .password(user.getPassword())
+            .authorities(user.getRole().toString())
+            .build();
     }
 }
 

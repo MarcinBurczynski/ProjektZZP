@@ -1,17 +1,22 @@
 package org.example.dto;
 
+import org.example.entity.Role;
 import org.example.entity.User;
 
 public class UserOperationDTO {
+    private Long id;
     private String username;
     private String password;
+    private String role;
 
     public UserOperationDTO() {
     }
 
     public UserOperationDTO(User u) {
+        this.id = u.getId();
         this.username = u.getUsername();
         this.password = u.getPassword();
+        this.role = u.getRole().toString();
     }
 
     public String getPassword() {
@@ -28,5 +33,21 @@ public class UserOperationDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return Role.valueOf(role);
+    }
+
+    public void setRole(Role role) {
+        this.role = role.toString();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

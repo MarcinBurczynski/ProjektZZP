@@ -1,13 +1,14 @@
 package org.example.controller;
 
-import org.example.dto.UserDTO;
+import org.example.dto.PermissionDTO;
 import org.example.dto.UserOperationDTO;
+import org.example.entity.Role;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class PublicUserController {
@@ -20,14 +21,15 @@ public class PublicUserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserOperationDTO userOperationDTO) {
-        String token = userService.login(userOperationDTO);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<PermissionDTO> login(@RequestBody UserOperationDTO userOperationDTO) {
+        PermissionDTO perm = userService.login(userOperationDTO);
+        return ResponseEntity.ok(perm);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody UserOperationDTO userOperationDTO) {
-        userService.register(userOperationDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<PermissionDTO> register(@RequestBody UserOperationDTO userOperationDTO) {
+        userOperationDTO.setRole(Role.USER);
+        PermissionDTO perm = userService.register(userOperationDTO);
+        return ResponseEntity.ok(perm);
     }
 }

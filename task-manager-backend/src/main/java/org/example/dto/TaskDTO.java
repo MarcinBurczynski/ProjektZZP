@@ -1,25 +1,35 @@
 package org.example.dto;
 
 import org.example.entity.Status;
+import org.example.entity.Task;
 
 public class TaskDTO {
 
     private Long id;
     private String title;
     private String description;
-    private Status status;
+    private String status;
     private Long categoryId;
     private Long userId;
 
     public TaskDTO() {}
 
-    public TaskDTO(Long id, String title, String description, Status status, Long categoryId, Long userId) {
+    public TaskDTO(Long id, String title, String description, String status, Long categoryId, Long userId) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
         this.categoryId = categoryId;
         this.userId = userId;
+    }
+
+    public TaskDTO(Task t) {
+        this.id = t.getId();
+        this.title = t.getTitle();
+        this.description = t.getDescription();
+        this.status = t.getStatus().toString();
+        this.categoryId = t.getCategory().getId();
+        this.userId = t.getUser().getId();
     }
 
     public Long getId() {
@@ -47,11 +57,11 @@ public class TaskDTO {
     }
 
     public Status getStatus() {
-        return status;
+        return Status.valueOf(status);
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        this.status = status.toString();
     }
 
     public Long getCategoryId() {

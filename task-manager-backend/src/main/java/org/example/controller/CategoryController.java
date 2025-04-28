@@ -1,7 +1,6 @@
 package org.example.controller;
 
 import org.example.dto.CategoryDTO;
-import org.example.dto.UserDTO;
 import org.example.entity.User;
 import org.example.service.CategoryService;
 import org.example.service.UserService;
@@ -11,15 +10,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
-
     private final CategoryService categoryService;
     private final UserService userService;
-    // Konstruktor
+
     @Autowired
     public CategoryController(CategoryService categoryService, UserService userService) {
         this.categoryService = categoryService;
@@ -29,32 +26,37 @@ public class CategoryController {
     @GetMapping
     public List<CategoryDTO> listCategories(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.getUserFromDetails(userDetails);
-        return categoryService.getCategoriesForUser(user)
-                .stream()
-                .map(category -> new CategoryDTO(category.getId(), category.getName()))
-                .collect(Collectors.toList());
-    }
-
-    @PostMapping
-    public CategoryDTO createCategory(@AuthenticationPrincipal UserDetails userDetails,
-                                      @RequestParam("name") String name) {
-        User user = userService.getUserFromDetails(userDetails);
-        var category = categoryService.createCategory(user, name);
-        return new CategoryDTO(category.getId(), category.getName());
+        return categoryService.getCategoriesForUser(user);
     }
 
     @GetMapping("/{id}")
     public CategoryDTO getCategory(@AuthenticationPrincipal UserDetails userDetails,
-                               @PathVariable("id") Long id) {
+                                   @PathVariable("id") Long id) {
         User user = userService.getUserFromDetails(userDetails);
         return categoryService.getCategoryByIdAndUser(user, id);
+    }
+
+    @PostMapping
+    public void createCategory(@AuthenticationPrincipal UserDetails userDetails,
+                               @RequestBody CategoryDTO categoryDTO) {
+        User user = userService.getUserFromDetails(userDetails);
+        categoryService.createCategory(user,categoryDTO);
+    }
+
+    @PutMapping("/{id}")
+    public void updateCategory(@AuthenticationPrincipal UserDetails userDetails,
+                               @PathVariable("id") Long id,
+                               @RequestBody CategoryDTO categoryDTO){
+        User user = userService.getUserFromDetails(userDetails);
+        categoryDTO.setId(id);
+        categoryService.updateCategory(user,categoryDTO);
     }
 
     @DeleteMapping("/{id}")
     public void deleteCategory(@AuthenticationPrincipal UserDetails userDetails,
                                @PathVariable("id") Long id) {
         User user = userService.getUserFromDetails(userDetails);
-        categoryService.deleteCategory(id, user);
+        categoryService.deleteCategory(user, id);
     }
 
 }

@@ -1,23 +1,28 @@
 package org.example.dto;
 
-public class CategoryDTO {
+import org.example.entity.Category;
 
+public class CategoryDTO {
     private Long id;
     private String name;
+    private Long userId;
 
     public CategoryDTO() {
     }
-    // Konstruktor
-    public CategoryDTO(Long id, String name) {
+
+    public CategoryDTO(Long id, String name, Long userId) {
         this.id = id;
         this.name = name;
-    }
-    public CategoryDTO(CategoryDTO dto) {
-        this.id = dto.getId();
-        this.name = dto.getName();
+        this.userId = userId;
     }
 
-    // Gettery i Settery
+    public CategoryDTO(Category c){
+        this.id = c.getId();
+        this.name = c.getName();
+        this.userId = c.getUser().getId();
+    }
+
+
     public Long getId() {
         return id;
     }
@@ -32,5 +37,13 @@ public class CategoryDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

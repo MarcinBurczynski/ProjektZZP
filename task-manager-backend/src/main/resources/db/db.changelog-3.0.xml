@@ -74,11 +74,5 @@
             <column name="user_id" value="10001"/>
             <column name="category_id" value="10002"/>
         </insert>
-
     </changeSet>
-
-
-
-
-
 </databaseChangeLog>

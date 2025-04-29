@@ -1,16 +1,49 @@
-<h2>Lista Kategorii</h2>
+<div class="container d-flex flex-column align-items-center">
+  <div
+    class="header d-flex justify-content-center align-items-center mb-4 mt-5"
+  >
+    <h3 class="mb-0">Kategorie</h3>
+  </div>
 
-<table>
-  <thead>
-  <tr>
-    <th>ID</th>
-    <th>Nazwa</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let category of categories">
-    <td>{{ category.id }}</td>
-    <td>{{ category.name }}</td>
-  </tr>
-  </tbody>
-</table>
+  <div
+    class="task-list-container flex-grow-1 d-flex flex-column overflow-auto w-100"
+    style="max-width: 80%"
+  >
+    <div
+      class="task-header d-flex justify-content-between align-items-center mb-2"
+    >
+      <div class="col-3 font-weight-bold">ID</div>
+      <div class="col-3 font-weight-bold">Nazwa</div>
+      <div class="col-3 font-weight-bold">Nazwa użytkownika</div>
+      <div class="col-3"></div>
+    </div>
+
+    <div
+      *ngIf="categories.length === 0"
+      class="d-flex justify-content-center align-items-center w-100"
+    >
+      <div class="info-card card mb-3 shadow-sm text-center w-100">
+        <p class="mb-0">Brak kategorii do wyświetlenia</p>
+      </div>
+    </div>
+
+    <div
+      *ngFor="let category of categories"
+      class="task-card card mb-3 shadow-sm w-100"
+    >
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div class="col-3">{{ category.id }}</div>
+        <div class="col-3">{{ category.name }}</div>
+        <div class="col-3">{{ getUsernameFromId(category.userId) }}</div>
+        <div class="col-3 text-right">
+          <button class="btn btn-link">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn btn-link">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

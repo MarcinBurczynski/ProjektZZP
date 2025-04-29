@@ -60,7 +60,9 @@
         <div
           class="card-footer mt-4 d-flex justify-content-between align-items-center"
         >
-          <button class="btn btn-primary">Dodaj</button>
+          <button class="btn btn-primary" (click)="showAddTaskPopup = true">
+            <i class="fa fa-plus me-1"></i> Dodaj
+          </button>
           <button (click)="goToTasks()" class="btn btn-outline-primary">
             Zobacz pełną listę →
           </button>
@@ -97,7 +99,7 @@
               class="btn btn-success"
               (click)="showAddCategoryPopup = true"
             >
-              Dodaj
+              <i class="fa fa-plus me-1"></i> Dodaj
             </button>
             <button (click)="goToCategories()" class="btn btn-outline-success">
               Zobacz pełną listę →
@@ -118,6 +120,13 @@
   </div>
   <app-add-category-popup
     [visible]="showAddCategoryPopup"
+    (confirm)="postNewCategory($event); showAddCategoryPopup = false"
     (cancel)="showAddCategoryPopup = false"
   ></app-add-category-popup>
+  <app-add-task-popup
+    [visible]="showAddTaskPopup"
+    [categories]="categories"
+    (confirm)="postNewTask($event); showAddTaskPopup = false"
+    (cancel)="showAddTaskPopup = false"
+  ></app-add-task-popup>
 </div>

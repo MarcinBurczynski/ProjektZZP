@@ -9,12 +9,14 @@ import {
 } from '../../utils/fetching_helper';
 import { Category, User, Task } from '../../utils/interfaces';
 import { AddCategoryPopupComponent } from '../components/add-category-popup/add-category-popup.component';
+import { postCategory, postTask } from '../../utils/posting_helper';
+import { AddTaskPopupComponent } from '../components/add-task-popup/add-task-popup.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  imports: [CommonModule, AddCategoryPopupComponent],
+  imports: [CommonModule, AddCategoryPopupComponent, AddTaskPopupComponent],
 })
 export class HomeComponent implements OnInit {
   constructor(private router: Router, private authService: AuthService) {}
@@ -27,6 +29,7 @@ export class HomeComponent implements OnInit {
   users: User[] = [];
 
   showAddCategoryPopup: boolean = false;
+  showAddTaskPopup: boolean = false;
 
   statusColors: { [key: string]: string } = {
     NEW: '#4dabf7',
@@ -46,6 +49,34 @@ export class HomeComponent implements OnInit {
     });
     fetchUsers().then((users) => {
       this.users = users;
+    });
+  }
+
+  postNewCategory(name: string) {
+    postCategory(name).then(() => {
+      fetchCategories().then((categories) => {
+        this.categories = categories;
+        this.categoriesForDisplay = categories.slice(0, 3);
+      });
+    });
+  }
+
+  postNewTask(obj: {
+    title: string;
+    description: string;
+    status: string;
+    categoryId: number;
+  }) {
+    postTask(
+      obj.title,
+      obj.description,
+      obj.status,
+      obj.categoryId,
+      Number(this.authService.getUserId())
+    ).then(() => {
+      fetchTasks().then((tasks) => {
+        this.tasks = tasks.slice(0, 3);
+      });
     });
   }
 

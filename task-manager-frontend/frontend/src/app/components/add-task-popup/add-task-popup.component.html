@@ -1,0 +1,80 @@
+<div *ngIf="visible" class="popup-overlay">
+  <div class="popup-content">
+    <h5 class="text-center mb-4">Dodaj nowe zadanie</h5>
+
+    <form (ngSubmit)="onConfirm()">
+      <div class="form-floating mb-3">
+        <input
+          type="text"
+          id="taskTitle"
+          class="form-control"
+          [(ngModel)]="taskTitle"
+          name="taskTitle"
+          placeholder="Nazwa zadania"
+          required
+        />
+        <label for="taskTitle">Nazwa zadania</label>
+      </div>
+
+      <div class="form-floating mb-3">
+        <textarea
+          id="taskDescription"
+          class="form-control"
+          [(ngModel)]="taskDescription"
+          name="taskDescription"
+          placeholder="Opis zadania"
+          style="height: 100px"
+          required
+        ></textarea>
+        <label for="taskDescription">Opis zadania</label>
+      </div>
+
+      <div class="form-floating mb-3">
+        <select
+          id="taskStatus"
+          class="form-select"
+          [(ngModel)]="taskStatus"
+          name="taskStatus"
+          required
+        >
+          <option value="" disabled selected>Wybierz status</option>
+          <option value="NEW">NEW</option>
+          <option value="IN_PROGRESS">IN_PROGRESS</option>
+          <option value="COMPLETED">COMPLETED</option>
+        </select>
+        <label for="taskStatus">Status</label>
+      </div>
+
+      <div class="form-floating mb-3">
+        <select
+          id="taskCategoryId"
+          class="form-select"
+          [(ngModel)]="taskCategoryId"
+          name="taskCategoryId"
+          required
+        >
+          <option value="" disabled selected>Wybierz kategorię</option>
+          <option *ngFor="let category of categories" [value]="category.id">
+            {{ category.name }}
+          </option>
+        </select>
+        <label for="taskCategoryId">Kategoria</label>
+      </div>
+
+      <div class="d-flex justify-content-end mt-4 gap-2">
+        <button
+          type="submit"
+          class="btn btn-success"
+          [disabled]="
+            !taskTitle || !taskDescription || !taskStatus || !taskCategoryId
+          "
+        >
+          <i class="fa fa-check me-1"></i> Zatwierdź
+        </button>
+        <button type="button" class="btn btn-danger" (click)="onCancel()">
+          <i class="fa fa-xmark me-1"></i> Anuluj
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

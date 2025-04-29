@@ -2,16 +2,21 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
-import { fetchCategories, fetchTasks, fetchUsers } from '../../utils/fetching_helper';
+import {
+  fetchCategories,
+  fetchTasks,
+  fetchUsers,
+} from '../../utils/fetching_helper';
 import { Category, User, Task } from '../../utils/interfaces';
+import { AddCategoryPopupComponent } from '../components/add-category-popup/add-category-popup.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  imports: [CommonModule],
+  imports: [CommonModule, AddCategoryPopupComponent],
 })
-export class HomeComponent implements OnInit{
+export class HomeComponent implements OnInit {
   constructor(private router: Router, private authService: AuthService) {}
 
   role: string | null = '';
@@ -21,23 +26,25 @@ export class HomeComponent implements OnInit{
   tasks: Task[] = [];
   users: User[] = [];
 
+  showAddCategoryPopup: boolean = false;
+
   statusColors: { [key: string]: string } = {
     NEW: '#4dabf7',
     IN_PROGRESS: '#ffa94d',
-    COMPLETED: '#69db7c'
+    COMPLETED: '#69db7c',
   };
 
   ngOnInit() {
     this.role = this.authService.getRole();
     this.username = this.authService.getUsername();
-    fetchCategories().then(categories => {
+    fetchCategories().then((categories) => {
       this.categories = categories;
       this.categoriesForDisplay = categories.slice(0, 3);
     });
-    fetchTasks().then(tasks => {
+    fetchTasks().then((tasks) => {
       this.tasks = tasks.slice(0, 3);
     });
-    fetchUsers().then(users => {
+    fetchUsers().then((users) => {
       this.users = users;
     });
   }
@@ -47,11 +54,13 @@ export class HomeComponent implements OnInit{
   }
 
   getUsernameFromId(userId: number): string {
-    return this.users.find(user => user.id === userId)?.username || '';
+    return this.users.find((user) => user.id === userId)?.username || '';
   }
 
   getCategoryNameFromId(categoryId: number): string {
-    return this.categories.find(category => category.id === categoryId)?.name || '';
+    return (
+      this.categories.find((category) => category.id === categoryId)?.name || ''
+    );
   }
 
   logout() {

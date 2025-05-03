@@ -53,10 +53,14 @@ public class TaskService {
 
     @Transactional
     public TaskDTO createTask(User user, TaskDTO taskDTO) {
-        if(taskDTO.getUserId()==null || !taskDTO.getUserId().equals(user.getId())){
+        if(taskDTO.getUserId()==null){
+            taskDTO.setUserId(user.getId());
+        }
+
+        if(!taskDTO.getUserId().equals(user.getId())){
             if(user.getRole().ordinal()>1){
                 throw new SecurityException("You can't create tasks for other users!!!");
-            }else if(taskDTO.getUserId()!=null){
+            }else{
                 user = userService.getUserObjectById(user, taskDTO.getUserId());
             }
         }
@@ -75,10 +79,14 @@ public class TaskService {
 
     @Transactional
     public void updateTask(User user, TaskDTO taskDTO) {
-        if(taskDTO.getUserId()==null || !taskDTO.getUserId().equals(user.getId())){
+        if(taskDTO.getUserId()==null){
+            taskDTO.setUserId(user.getId());
+        }
+
+        if(!taskDTO.getUserId().equals(user.getId())){
             if(user.getRole().ordinal()>1){
                 throw new SecurityException("You can't update tasks for other users!!!");
-            }else if(taskDTO.getUserId()!=null){
+            }else{
                 user = userService.getUserObjectById(user, taskDTO.getUserId());
             }
         }

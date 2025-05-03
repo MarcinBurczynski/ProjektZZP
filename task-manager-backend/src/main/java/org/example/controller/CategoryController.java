@@ -37,10 +37,10 @@ public class CategoryController {
     }
 
     @PostMapping
-    public void createCategory(@AuthenticationPrincipal UserDetails userDetails,
+    public CategoryDTO createCategory(@AuthenticationPrincipal UserDetails userDetails,
                                @RequestBody CategoryDTO categoryDTO) {
         User user = userService.getUserFromDetails(userDetails);
-        categoryService.createCategory(user,categoryDTO);
+        return categoryService.createCategory(user,categoryDTO);
     }
 
     @PutMapping("/{id}")

@@ -16,6 +16,7 @@
           [(ngModel)]="categoryName"
           name="categoryName"
           placeholder="Nazwa kategorii"
+          maxlength="255"
           required
         />
         <label for="categoryName">Nazwa kategorii</label>
@@ -24,12 +25,12 @@
       <div class="form-floating mb-3" *ngIf="canEditUserId">
         <select
           id="categoryUser"
-          class="form-control"
-          [(ngModel)]="selectedUsername"
+          class="form-select"
+          [(ngModel)]="categoryUserId"
           name="categoryUser"
           required
         >
-          <option *ngFor="let user of users" [value]="user.username">
+          <option *ngFor="let user of users" [value]="user.id">
             {{ user.username }}
           </option>
         </select>

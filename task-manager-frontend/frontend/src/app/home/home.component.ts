@@ -11,6 +11,7 @@ import { Category, User, Task } from '../../utils/interfaces';
 import { AddCategoryPopupComponent } from '../components/add-category-popup/add-category-popup.component';
 import { postCategory, postTask } from '../../utils/posting_helper';
 import { AddTaskPopupComponent } from '../components/add-task-popup/add-task-popup.component';
+import { statusColors, statusTranslations } from '../../utils/statuses';
 
 @Component({
   selector: 'app-home',
@@ -23,6 +24,7 @@ export class HomeComponent implements OnInit {
 
   role: string | null = '';
   username: string | null = '';
+  userId: number | null = null;
   categories: Category[] = [];
   categoriesForDisplay: Category[] = [];
   tasks: Task[] = [];
@@ -33,16 +35,11 @@ export class HomeComponent implements OnInit {
 
   isAdminOrModerator: boolean = false;
 
-  statusColors: { [key: string]: string } = {
-    NEW: '#4dabf7',
-    IN_PROGRESS: '#ffa94d',
-    COMPLETED: '#69db7c',
-  };
-
   ngOnInit() {
     this.username = this.authService.getUsername();
     this.role = this.authService.getRole();
     this.isAdminOrModerator = this.role !== 'USER';
+    this.userId = this.authService.getUserId();
 
     fetchCategories().then((categories) => {
       this.categories = categories;
@@ -55,8 +52,8 @@ export class HomeComponent implements OnInit {
       fetchUsers().then((users) => (this.users = users));
   }
 
-  postNewCategory(name: string) {
-    postCategory(name).then(() => {
+  postNewCategory(obj: { name: string; userId: number }) {
+    postCategory(obj.name, obj.userId).then(() => {
       fetchCategories().then((categories) => {
         this.categories = categories;
         this.categoriesForDisplay = categories.slice(0, 3);
@@ -69,22 +66,29 @@ export class HomeComponent implements OnInit {
     description: string;
     status: string;
     categoryId: number;
+    userId: number;
   }) {
     postTask(
       obj.title,
       obj.description,
       obj.status,
       obj.categoryId,
-      Number(this.authService.getUserId())
-    ).then(() => {
-      fetchTasks().then((tasks) => {
-        this.tasks = tasks.slice(0, 3);
-      });
+      obj.userId
+    ).then((success) => {
+      if (success) {
+        fetchTasks().then((tasks) => {
+          this.tasks = tasks.slice(0, 3);
+        });
+      }
     });
   }
 
   getStatusColor(status: string): string {
-    return this.statusColors[status] || '#adb5bd';
+    return statusColors[status] || '#adb5bd';
+  }
+
+  getTranslatedStatus(status: string): string {
+    return statusTranslations[status] || status;
   }
 
   getUsernameFromId(userId: number): string {

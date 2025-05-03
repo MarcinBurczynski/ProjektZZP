@@ -57,7 +57,7 @@
                       color: '#fff'
                     }"
                   >
-                    {{ task.status }}
+                    {{ getTranslatedStatus(task.status) }}
                   </span>
                 </div>
                 <div class="col-3">
@@ -139,12 +139,18 @@
   </div>
   <app-add-category-popup
     [visible]="showAddCategoryPopup"
+    [users]="users"
+    [canEditUserId]="isAdminOrModerator"
+    [loggedUserId]="userId"
     (confirm)="postNewCategory($event); showAddCategoryPopup = false"
     (cancel)="showAddCategoryPopup = false"
   ></app-add-category-popup>
   <app-add-task-popup
     [visible]="showAddTaskPopup"
     [categories]="categories"
+    [users]="users"
+    [loggedUserId]="userId"
+    [canEditUserId]="isAdminOrModerator"
     (confirm)="postNewTask($event); showAddTaskPopup = false"
     (cancel)="showAddTaskPopup = false"
   ></app-add-task-popup>

@@ -4,7 +4,7 @@ import { Category, User } from '../../../utils/interfaces';
 import { fetchCategories, fetchUsers } from '../../../utils/fetching_helper';
 import { EditCategoryPopupComponent } from '../../components/edit-category-popup/edit-category-popup.component';
 import { AuthService } from '../../auth/auth.service';
-import { DeleteCategoryPopupComponent } from '../../components/delete-category-popup/delete-category-popup.component';
+import { DeleteElementPopupComponent } from '../../components/delete-element-popup/delete-element-popup.component';
 import { deleteCategory } from '../../../utils/deleting_helper';
 import { putCategory } from '../../../utils/putting_helper';
 import { AddCategoryPopupComponent } from '../../components/add-category-popup/add-category-popup.component';
@@ -18,7 +18,7 @@ import { Router } from '@angular/router';
   imports: [
     CommonModule,
     EditCategoryPopupComponent,
-    DeleteCategoryPopupComponent,
+    DeleteElementPopupComponent,
     AddCategoryPopupComponent,
   ],
 })
@@ -28,6 +28,7 @@ export class CategoryListComponent implements OnInit {
   categories: Category[] = [];
   users: User[] = [];
   username: string | null = '';
+  userId: number | null = null;
   role: string | null = '';
 
   showDeletePopup: boolean = false;
@@ -43,6 +44,7 @@ export class CategoryListComponent implements OnInit {
     this.username = this.authService.getUsername();
     this.role = this.authService.getRole();
     this.isAdminOrModerator = this.role !== 'USER';
+    this.userId = this.authService.getUserId();
     fetchCategories().then((categories) => (this.categories = categories));
     if (this.isAdminOrModerator)
       fetchUsers().then((users) => (this.users = users));
@@ -103,8 +105,8 @@ export class CategoryListComponent implements OnInit {
     this.categoryToDelete = null;
   }
 
-  postNewCategory(name: string) {
-    postCategory(name).then(() => {
+  postNewCategory(obj: { name: string; userId: number }) {
+    postCategory(obj.name, obj.userId).then(() => {
       fetchCategories().then((categories) => {
         this.categories = categories;
       });

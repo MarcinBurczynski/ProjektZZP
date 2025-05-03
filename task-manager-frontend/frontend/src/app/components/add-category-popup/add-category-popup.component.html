@@ -16,9 +16,26 @@
           [(ngModel)]="categoryName"
           name="categoryName"
           placeholder="Nazwa kategorii"
+          maxlength="255"
           required
         />
         <label for="categoryName">Nazwa kategorii</label>
+      </div>
+
+      <div class="form-floating mb-3" *ngIf="canEditUserId">
+        <select
+          id="taskUser"
+          class="form-select"
+          [(ngModel)]="categoryUserId"
+          name="taskUser"
+          required
+        >
+          <option value="" disabled selected>Wybierz użytkownika</option>
+          <option *ngFor="let user of users" [value]="user.id">
+            {{ user.username }}
+          </option>
+        </select>
+        <label for="taskUser">Użytkownik</label>
       </div>
 
       <div class="d-flex justify-content-end mt-4 gap-2">

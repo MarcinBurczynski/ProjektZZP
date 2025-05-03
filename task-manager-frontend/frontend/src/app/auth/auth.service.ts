@@ -68,8 +68,9 @@ export class AuthService {
     );
   }
 
-  getUserId(): string | null {
-    return this.cookieService.get('taskero_userId');
+  getUserId(): number | null {
+    const userId = this.cookieService.get('taskero_userId');
+    return userId ? parseInt(userId, 10) : null;
   }
 
   removeUserId(): void {

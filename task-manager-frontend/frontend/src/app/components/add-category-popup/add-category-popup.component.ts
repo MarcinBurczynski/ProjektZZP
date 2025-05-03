@@ -14,6 +14,7 @@ import {
   transition,
   query,
 } from '@angular/animations';
+import { User } from '../../../utils/interfaces';
 
 @Component({
   selector: 'app-add-category-popup',
@@ -53,10 +54,14 @@ import {
 })
 export class AddCategoryPopupComponent {
   @Input() visible: boolean = false;
-  @Output() confirm = new EventEmitter<string>();
+  @Input() users: User[] = [];
+  @Input() loggedUserId: number | null = null;
+  @Input() canEditUserId: boolean = false;
+  @Output() confirm = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<void>();
 
   categoryName: string = '';
+  categoryUserId: number | null = null;
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEsc() {
@@ -72,14 +77,19 @@ export class AddCategoryPopupComponent {
 
   onConfirm() {
     if (this.categoryName.trim()) {
-      this.confirm.emit(this.categoryName.trim());
+      this.confirm.emit({
+        name: this.categoryName.trim(),
+        userId: this.categoryUserId || this.loggedUserId,
+      });
       this.categoryName = '';
+      this.categoryUserId = null;
     }
   }
 
   onCancel() {
     this.cancel.emit();
     this.categoryName = '';
+    this.categoryUserId = null;
   }
 
   close(callback?: () => void) {

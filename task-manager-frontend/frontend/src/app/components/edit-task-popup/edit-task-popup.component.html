@@ -1,11 +1,11 @@
 <div
   *ngIf="visible"
-  [@popupAnimation]
   class="popup-overlay"
+  [@popupAnimation]
   (click)="onOverlayClick($event)"
 >
   <div class="popup-content">
-    <h5 class="text-center mb-4">Dodaj nowe zadanie</h5>
+    <h5 class="text-center mb-4">Edytuj zadanie</h5>
 
     <form (ngSubmit)="onConfirm()">
       <div class="form-floating mb-3">
@@ -15,11 +15,11 @@
           class="form-control"
           [(ngModel)]="taskTitle"
           name="taskTitle"
-          placeholder="Nazwa zadania"
+          placeholder="Nazwa kategorii"
           maxlength="255"
           required
         />
-        <label for="taskTitle">Nazwa zadania</label>
+        <label for="taskTitle">Nazwa kategorii</label>
       </div>
 
       <div class="form-floating mb-3">
@@ -60,7 +60,6 @@
           name="taskUser"
           required
         >
-          <option value="" disabled selected>Wybierz użytkownika</option>
           <option *ngFor="let user of users" [value]="user.id">
             {{ user.username }}
           </option>
@@ -70,27 +69,24 @@
 
       <div class="form-floating mb-3">
         <select
-          id="taskCategoryId"
+          id="taskCategory"
           class="form-select"
           [(ngModel)]="taskCategoryId"
-          name="taskCategoryId"
+          name="taskCategory"
           required
         >
-          <option value="" disabled selected>Wybierz kategorię</option>
           <option *ngFor="let category of categories" [value]="category.id">
             {{ category.name }}
           </option>
         </select>
-        <label for="taskCategoryId">Kategoria</label>
+        <label for="taskCategory">Kategoria</label>
       </div>
 
       <div class="d-flex justify-content-end mt-4 gap-2">
         <button
           type="submit"
-          class="btn btn-success"
-          [disabled]="
-            !taskTitle || !taskDescription || !taskStatus || !taskCategoryId
-          "
+          class="btn btn-success mr-2"
+          [disabled]="!taskTitle || !taskDescription || !taskStatus"
         >
           <i class="fa fa-check me-1"></i> Zatwierdź
         </button>

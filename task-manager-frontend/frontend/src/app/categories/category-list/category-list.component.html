@@ -34,6 +34,7 @@
     class="task-list-container flex-grow-1 d-flex flex-column overflow-auto w-100"
   >
     <div
+      *ngIf="categories.length !== 0"
       class="task-header d-flex justify-content-between text-center align-items-center mb-2 px-3"
     >
       <div class="col-3 fw-bold">ID</div>
@@ -42,12 +43,11 @@
       <div class="col-3"></div>
     </div>
 
-    <div
-      *ngIf="categories.length === 0"
-      class="d-flex justify-content-center align-items-center w-100"
-    >
-      <div class="info-card card mb-3 shadow-sm text-center w-100">
-        <p class="mb-0">Brak kategorii do wyświetlenia</p>
+    <div *ngIf="categories.length === 0" class="text-center mt-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <p class="mb-0">Brak kategorii do wyświetlenia</p>
+        </div>
       </div>
     </div>
 
@@ -97,16 +97,19 @@
   (cancel)="handleCancelEdit()"
 ></app-edit-category-popup>
 
-<app-delete-category-popup
+<app-delete-element-popup
   [visible]="showDeletePopup"
   [itemType]="'kategorię'"
   [itemName]="categoryToDelete?.name || ''"
   (confirm)="handleConfirmDelete()"
   (cancel)="handleCancelDelete()"
-></app-delete-category-popup>
+></app-delete-element-popup>
 
 <app-add-category-popup
   [visible]="showAddCategoryPopup"
+  [users]="users"
+  [canEditUserId]="isAdminOrModerator"
+  [loggedUserId]="userId"
   (confirm)="postNewCategory($event); showAddCategoryPopup = false"
   (cancel)="showAddCategoryPopup = false"
 ></app-add-category-popup>

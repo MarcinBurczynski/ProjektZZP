@@ -63,8 +63,7 @@ export class EditCategoryPopupComponent implements OnChanges {
   @Output() confirm = new EventEmitter<Category>();
   @Output() cancel = new EventEmitter<void>();
 
-  categoryName = '';
-  selectedUsername: string = '';
+  categoryName: string = '';
   categoryUserId: number | null = null;
 
   @HostListener('document:keydown.escape', ['$event'])
@@ -83,7 +82,6 @@ export class EditCategoryPopupComponent implements OnChanges {
     if (changes['category'] && this.category) {
       this.categoryName = this.category.name;
       this.categoryUserId = this.category.userId;
-      this.selectedUsername = this.getUsernameFromId(this.category.userId);
     }
   }
 
@@ -95,14 +93,10 @@ export class EditCategoryPopupComponent implements OnChanges {
   onConfirm(): void {
     if (!this.category || this.categoryUserId == null) return;
 
-    const user = this.users.find(
-      (user) => user.username === this.selectedUsername
-    );
-
     this.confirm.emit({
       ...this.category,
       name: this.categoryName,
-      userId: user ? user.id : this.category.userId,
+      userId: this.category.userId,
     });
 
     this.visible = false;

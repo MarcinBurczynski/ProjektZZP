@@ -15,10 +15,10 @@ import {
 } from '@angular/animations';
 
 @Component({
-  selector: 'app-delete-category-popup',
+  selector: 'app-delete-element-popup',
   imports: [CommonModule],
-  templateUrl: './delete-category-popup.component.html',
-  styleUrl: './delete-category-popup.component.css',
+  templateUrl: './delete-element-popup.component.html',
+  styleUrl: './delete-element-popup.component.css',
   standalone: true,
   animations: [
     trigger('popupAnimation', [
@@ -50,7 +50,7 @@ import {
     ]),
   ],
 })
-export class DeleteCategoryPopupComponent {
+export class DeleteElementPopupComponent {
   @Input() visible: boolean = false;
   @Input() itemType: string = 'element';
   @Input() itemName: string = '';

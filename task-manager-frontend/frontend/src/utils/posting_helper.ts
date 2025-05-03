@@ -1,9 +1,13 @@
 import apiClient from '../environments/axios';
 
-export async function postCategory(name: string): Promise<boolean> {
+export async function postCategory(
+  name: string,
+  userId: number
+): Promise<boolean> {
   try {
     const response = await apiClient.post('/api/categories', {
       name: name,
+      userId: userId,
     });
     if (response.status === 200) {
       return true;

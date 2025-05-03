@@ -1,9 +1,11 @@
 import {
   Component,
-  EventEmitter,
-  HostListener,
   Input,
   Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,11 +19,11 @@ import {
 } from '@angular/animations';
 
 @Component({
-  selector: 'app-add-task-popup',
-  templateUrl: './add-task-popup.component.html',
-  styleUrl: './add-task-popup.component.css',
-  standalone: true,
+  selector: 'app-edit-task-popup',
   imports: [CommonModule, FormsModule],
+  templateUrl: './edit-task-popup.component.html',
+  styleUrl: './edit-task-popup.component.css',
+  standalone: true,
   animations: [
     trigger('popupAnimation', [
       transition(':enter', [
@@ -52,21 +54,61 @@ import {
     ]),
   ],
 })
-export class AddTaskPopupComponent {
+export class EditTaskPopupComponent implements OnChanges {
   @Input() visible: boolean = false;
-  @Input() categories: Category[] = [];
+  @Input() task: Task | null = null;
   @Input() users: User[] = [];
-  @Input() loggedUserId: number | null = null;
+  @Input() categories: Category[] = [];
   @Input() canEditUserId: boolean = false;
 
-  @Output() confirm = new EventEmitter<any>();
+  @Output() confirm = new EventEmitter<Task>();
   @Output() cancel = new EventEmitter<void>();
 
   taskTitle: string = '';
   taskDescription: string = '';
   taskStatus: string = '';
-  taskCategoryId: string = '';
-  taskUserId: string = '';
+  selectedCategory: string = '';
+  selectedUsername: string = '';
+  taskCategoryId: number | null = null;
+  taskUserId: number | null = null;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['task'] && this.task) {
+      this.taskTitle = this.task.title;
+      this.taskDescription = this.task.description;
+      this.taskStatus = this.task.status;
+      this.selectedCategory = this.getCategoryNameFromId(this.task.categoryId);
+      this.selectedUsername = this.getUsernameFromId(this.task.userId);
+      this.taskCategoryId = this.task.categoryId;
+      this.taskUserId = this.task.userId;
+    }
+  }
+
+  onConfirm(): void {
+    if (!this.task || this.taskUserId == null || this.taskCategoryId == null)
+      return;
+
+    this.confirm.emit({
+      ...this.task,
+      title: this.taskTitle,
+      description: this.taskDescription,
+      status: this.taskStatus,
+      categoryId: this.taskCategoryId,
+      userId: this.taskUserId,
+    });
+
+    this.visible = false;
+  }
+
+  getUsernameFromId(userId: number): string {
+    return this.users.find((user) => user.id === userId)?.username || '';
+  }
+
+  getCategoryNameFromId(categoryId: number): string {
+    return (
+      this.categories.find((category) => category.id === categoryId)?.name || ''
+    );
+  }
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEsc() {
@@ -80,31 +122,9 @@ export class AddTaskPopupComponent {
     }
   }
 
-  onConfirm() {
-    if (this.taskTitle.trim() && this.taskCategoryId && this.taskStatus) {
-      const newTask = {
-        title: this.taskTitle.trim(),
-        description: this.taskDescription.trim(),
-        status: this.taskStatus,
-        categoryId: this.taskCategoryId,
-        userId: this.taskUserId || this.loggedUserId,
-      };
-      this.confirm.emit(newTask);
-      this.resetForm();
-    }
-  }
-
-  onCancel() {
+  onCancel(): void {
     this.cancel.emit();
-    this.resetForm();
-  }
-
-  private resetForm() {
-    this.taskTitle = '';
-    this.taskDescription = '';
-    this.taskStatus = '';
-    this.taskCategoryId = '';
-    this.taskUserId = '';
+    this.visible = false;
   }
 
   close(callback?: () => void) {

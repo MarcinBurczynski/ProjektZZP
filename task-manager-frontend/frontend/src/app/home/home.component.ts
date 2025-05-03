@@ -26,7 +26,6 @@ export class HomeComponent implements OnInit {
   username: string | null = '';
   userId: number | null = null;
   categories: Category[] = [];
-  categoriesForDisplay: Category[] = [];
   tasks: Task[] = [];
   users: User[] = [];
 
@@ -43,10 +42,9 @@ export class HomeComponent implements OnInit {
 
     fetchCategories().then((categories) => {
       this.categories = categories;
-      this.categoriesForDisplay = categories.slice(0, 3);
     });
     fetchTasks().then((tasks) => {
-      this.tasks = tasks.slice(0, 3);
+      this.tasks = tasks;
     });
     if (this.isAdminOrModerator)
       fetchUsers().then((users) => (this.users = users));
@@ -56,7 +54,6 @@ export class HomeComponent implements OnInit {
     postCategory(obj.name, obj.userId).then(() => {
       fetchCategories().then((categories) => {
         this.categories = categories;
-        this.categoriesForDisplay = categories.slice(0, 3);
       });
     });
   }
@@ -77,10 +74,49 @@ export class HomeComponent implements OnInit {
     ).then((success) => {
       if (success) {
         fetchTasks().then((tasks) => {
-          this.tasks = tasks.slice(0, 3);
+          this.tasks = tasks;
         });
       }
     });
+  }
+
+  getNewTasksNumber(): number {
+    return this.tasks.filter(
+      (task) => task.userId === this.userId && task.status === 'NEW'
+    ).length;
+  }
+
+  getRemaningTasksNumber(): number {
+    return this.tasks.filter(
+      (task) => task.userId === this.userId && task.status === 'IN_PROGRESS'
+    ).length;
+  }
+
+  getDoneTasksNumber(): number {
+    return this.tasks.filter(
+      (task) => task.userId === this.userId && task.status === 'COMPLETED'
+    ).length;
+  }
+
+  getCategoriesNumber(): number {
+    return this.categories.filter((category) => category.userId === this.userId)
+      .length;
+  }
+
+  getNewTasksNumberSystem(): number {
+    return this.tasks.filter((task) => task.status === 'NEW').length;
+  }
+
+  getRemaningTasksNumberSystem(): number {
+    return this.tasks.filter((task) => task.status === 'IN_PROGRESS').length;
+  }
+
+  getDoneTasksNumberSystem(): number {
+    return this.tasks.filter((task) => task.status === 'COMPLETED').length;
+  }
+
+  getCategoriesNumberSystem(): number {
+    return this.categories.length;
   }
 
   getStatusColor(status: string): string {

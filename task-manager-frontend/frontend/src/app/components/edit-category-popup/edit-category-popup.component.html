@@ -1,4 +1,9 @@
-<div *ngIf="visible" class="popup-overlay">
+<div
+  *ngIf="visible"
+  class="popup-overlay"
+  [@popupAnimation]
+  (click)="onOverlayClick($event)"
+>
   <div class="popup-content">
     <h5 class="text-center mb-4">Edytuj kategorię</h5>
 

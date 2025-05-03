@@ -1,0 +1,8 @@
+<div *ngIf="visible" class="toast" [@toastAnimation] [ngStyle]="toastStyle">
+  <i class="pi" [ngClass]="icon"></i>
+  <div class="toast-content">
+    <strong>{{ header }}</strong>
+    <p>{{ message }}</p>
+  </div>
+  <button class="close-btn" (click)="close()">×</button>
+</div>

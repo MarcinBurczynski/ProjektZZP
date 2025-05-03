@@ -1,13 +1,11 @@
 import {
   Component,
   EventEmitter,
-  HostListener,
   Input,
   Output,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Category } from '../../../utils/interfaces';
 import {
   trigger,
   style,
@@ -17,11 +15,11 @@ import {
 } from '@angular/animations';
 
 @Component({
-  selector: 'app-add-task-popup',
-  templateUrl: './add-task-popup.component.html',
-  styleUrl: './add-task-popup.component.css',
+  selector: 'app-delete-category-popup',
+  imports: [CommonModule],
+  templateUrl: './delete-category-popup.component.html',
+  styleUrl: './delete-category-popup.component.css',
   standalone: true,
-  imports: [CommonModule, FormsModule],
   animations: [
     trigger('popupAnimation', [
       transition(':enter', [
@@ -52,17 +50,12 @@ import {
     ]),
   ],
 })
-export class AddTaskPopupComponent {
+export class DeleteCategoryPopupComponent {
   @Input() visible: boolean = false;
-  @Input() categories: Category[] = [];
-
-  @Output() confirm = new EventEmitter<any>();
+  @Input() itemType: string = 'element';
+  @Input() itemName: string = '';
+  @Output() confirm = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
-
-  taskTitle: string = '';
-  taskDescription: string = '';
-  taskStatus: string = '';
-  taskCategoryId: string = '';
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEsc() {
@@ -77,28 +70,7 @@ export class AddTaskPopupComponent {
   }
 
   onConfirm() {
-    if (this.taskTitle.trim() && this.taskCategoryId && this.taskStatus) {
-      const newTask = {
-        title: this.taskTitle.trim(),
-        description: this.taskDescription.trim(),
-        status: this.taskStatus,
-        categoryId: this.taskCategoryId,
-      };
-      this.confirm.emit(newTask);
-      this.resetForm();
-    }
-  }
-
-  onCancel() {
-    this.cancel.emit();
-    this.resetForm();
-  }
-
-  private resetForm() {
-    this.taskTitle = '';
-    this.taskDescription = '';
-    this.taskStatus = '';
-    this.taskCategoryId = '';
+    this.close(() => this.confirm.emit());
   }
 
   close(callback?: () => void) {

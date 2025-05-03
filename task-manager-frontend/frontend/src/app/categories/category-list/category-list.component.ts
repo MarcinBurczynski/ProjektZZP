@@ -3,15 +3,23 @@ import { CommonModule } from '@angular/common';
 import { Category, User } from '../../../utils/interfaces';
 import { fetchCategories, fetchUsers } from '../../../utils/fetching_helper';
 import { EditCategoryPopupComponent } from '../../components/edit-category-popup/edit-category-popup.component';
-import { getRole } from '../../../utils/role_getter';
+import { AuthService } from '../../auth/auth.service';
+import { DeleteCategoryPopupComponent } from '../../components/delete-category-popup/delete-category-popup.component';
+import { deleteCategory } from '../../../utils/deleting_helper';
 
 @Component({
   selector: 'app-category-list',
   templateUrl: './category-list.component.html',
   styleUrls: ['./category-list.component.css'],
-  imports: [CommonModule,EditCategoryPopupComponent],
+  imports: [
+    CommonModule,
+    EditCategoryPopupComponent,
+    DeleteCategoryPopupComponent,
+  ],
 })
 export class CategoryListComponent implements OnInit {
+  constructor(private authService: AuthService) {}
+
   categories: Category[] = [];
   users: User[] = [];
 
@@ -21,13 +29,13 @@ export class CategoryListComponent implements OnInit {
   categoryToDelete: Category | null = null;
   categoryToEdit: Category | null = null;
 
-  isAdminOrModerator = getRole()!=="USER"; // replace with real permission check
-
-  constructor() {}
+  isAdminOrModerator: boolean = false;
 
   ngOnInit(): void {
     fetchCategories().then((categories) => (this.categories = categories));
-    if(this.isAdminOrModerator)fetchUsers().then((users) => (this.users = users));
+    this.isAdminOrModerator = this.authService.getRole() !== 'USER';
+    if (this.isAdminOrModerator)
+      fetchUsers().then((users) => (this.users = users));
   }
 
   editCategory(category: Category): void {
@@ -49,20 +57,24 @@ export class CategoryListComponent implements OnInit {
     this.categoryToEdit = null;
   }
 
-  deleteCategory(category: any): void {
+  deleteCategory(category: Category): void {
     this.categoryToDelete = category;
     this.showDeletePopup = true;
   }
 
   confirmDelete(): void {
-//     this.categories = this.categories.filter(
-//       (category) => category.id !== this.categoryToDelete.id
-//     );
-//     this.showDeletePopup = false;
-  }
-
-  cancelDelete(): void {
+    if (!this.categoryToDelete) return;
+    const toDeleteId: number = this.categoryToDelete.id;
+    deleteCategory(this.categoryToDelete.id).then((success) => {
+      if (success) {
+        const index = this.categories.findIndex((c) => c.id === toDeleteId);
+        if (index !== -1) {
+          this.categories.splice(index, 1);
+        }
+      }
+    });
     this.showDeletePopup = false;
+    this.categoryToDelete = null;
   }
 
   getUsernameFromId(userId: number): string {

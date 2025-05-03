@@ -39,7 +39,7 @@
           <button class="btn btn-link" (click)="editCategory(category)">
             <i class="fas fa-edit"></i>
           </button>
-          <button class="btn btn-link">
+          <button class="btn btn-link" (click)="deleteCategory(category)">
             <i class="fas fa-trash-alt"></i>
           </button>
         </div>
@@ -56,3 +56,11 @@
   (confirm)="handleConfirmEdit($event)"
   (cancel)="handleCancelEdit()"
 ></app-edit-category-popup>
+
+<app-delete-category-popup
+  [visible]="showDeletePopup"
+  [itemType]="'kategorię'"
+  [itemName]="categoryToDelete?.name || ''"
+  (confirm)="confirmDelete()"
+  (cancel)="showDeletePopup = false"
+></app-delete-category-popup>

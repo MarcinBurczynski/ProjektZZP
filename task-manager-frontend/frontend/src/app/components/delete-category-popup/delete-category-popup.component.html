@@ -1,0 +1,28 @@
+<div
+  class="popup-overlay"
+  *ngIf="visible"
+  [@popupAnimation]
+  (click)="onOverlayClick($event)"
+>
+  <div class="popup-content" *ngIf="visible">
+    <h5 class="text-center mb-3">Potwierdź usunięcie</h5>
+    <p class="text-center">
+      Czy na pewno chcesz usunąć <strong>{{ itemType }}</strong>
+      <span *ngIf="itemName">
+        "<strong>{{ itemName }}</strong
+        >"</span
+      >?
+      <br />
+      Tej operacji nie można cofnąć.
+    </p>
+
+    <div class="d-flex justify-content-end mt-4 gap-2">
+      <button type="button" class="btn btn-danger" (click)="onConfirm()">
+        <i class="fa fa-trash me-1"></i> Usuń
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="close()">
+        <i class="fa fa-xmark me-1"></i> Anuluj
+      </button>
+    </div>
+  </div>
+</div>

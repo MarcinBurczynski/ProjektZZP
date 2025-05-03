@@ -31,6 +31,8 @@ export class HomeComponent implements OnInit {
   showAddCategoryPopup: boolean = false;
   showAddTaskPopup: boolean = false;
 
+  isAdminOrModerator: boolean = false;
+
   statusColors: { [key: string]: string } = {
     NEW: '#4dabf7',
     IN_PROGRESS: '#ffa94d',
@@ -38,8 +40,10 @@ export class HomeComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.role = this.authService.getRole();
     this.username = this.authService.getUsername();
+    this.role = this.authService.getRole();
+    this.isAdminOrModerator = this.role !== 'USER';
+
     fetchCategories().then((categories) => {
       this.categories = categories;
       this.categoriesForDisplay = categories.slice(0, 3);
@@ -47,9 +51,8 @@ export class HomeComponent implements OnInit {
     fetchTasks().then((tasks) => {
       this.tasks = tasks.slice(0, 3);
     });
-    fetchUsers().then((users) => {
-      this.users = users;
-    });
+    if (this.isAdminOrModerator)
+      fetchUsers().then((users) => (this.users = users));
   }
 
   postNewCategory(name: string) {

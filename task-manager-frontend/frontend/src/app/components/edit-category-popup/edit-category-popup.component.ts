@@ -98,12 +98,11 @@ export class EditCategoryPopupComponent implements OnChanges {
     const user = this.users.find(
       (user) => user.username === this.selectedUsername
     );
-    if (!user) return;
 
     this.confirm.emit({
       ...this.category,
       name: this.categoryName,
-      userId: this.canEditUserId ? user.id : this.category.userId,
+      userId: user ? user.id : this.category.userId,
     });
 
     this.visible = false;

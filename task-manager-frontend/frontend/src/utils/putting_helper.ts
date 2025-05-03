@@ -1,23 +1,29 @@
 import apiClient from '../environments/axios';
 
-export async function postCategory(name: string): Promise<boolean> {
+export async function putCategory(
+  categoryId: number,
+  name: string,
+  userId: number
+): Promise<boolean> {
   try {
-    const response = await apiClient.post('/api/categories', {
+    const response = await apiClient.put('/api/categories/' + categoryId, {
       name: name,
+      userId: userId,
     });
     if (response.status === 200) {
       return true;
     } else {
-      console.error('Failed to post category:', response.status);
+      console.error('Failed to put category:', response.status);
       return false;
     }
   } catch (error) {
-    console.error('Error posting category:', error);
+    console.error('Error putting category:', error);
     return false;
   }
 }
 
-export async function postTask(
+export async function putTask(
+  taskId: number,
   title: string,
   description: string,
   status: string,
@@ -25,7 +31,7 @@ export async function postTask(
   userId: number
 ): Promise<boolean> {
   try {
-    const response = await apiClient.post('/api/tasks', {
+    const response = await apiClient.put('/api/tasks/' + taskId, {
       title: title,
       description: description,
       status: status,
@@ -35,23 +41,24 @@ export async function postTask(
     if (response.status === 200) {
       return true;
     } else {
-      console.error('Failed to post task:', response.status);
+      console.error('Failed to put task:', response.status);
       return false;
     }
   } catch (error) {
-    console.error('Error posting task:', error);
+    console.error('Error putting task:', error);
     return false;
   }
 }
 
-export async function postUser(
+export async function putUser(
+  userId: number,
   username: string,
   password: string,
   email: string,
   role: number
 ): Promise<boolean> {
   try {
-    const response = await apiClient.post('/api/users', {
+    const response = await apiClient.put('/api/users/' + userId, {
       username: username,
       password: password,
       email: email,
@@ -60,11 +67,11 @@ export async function postUser(
     if (response.status === 200) {
       return true;
     } else {
-      console.error('Failed to fetch users:', response.status);
+      console.error('Failed to put user:', response.status);
       return false;
     }
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error('Error putting user:', error);
     return false;
   }
 }

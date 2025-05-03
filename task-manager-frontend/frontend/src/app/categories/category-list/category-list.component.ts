@@ -6,6 +6,10 @@ import { EditCategoryPopupComponent } from '../../components/edit-category-popup
 import { AuthService } from '../../auth/auth.service';
 import { DeleteCategoryPopupComponent } from '../../components/delete-category-popup/delete-category-popup.component';
 import { deleteCategory } from '../../../utils/deleting_helper';
+import { putCategory } from '../../../utils/putting_helper';
+import { AddCategoryPopupComponent } from '../../components/add-category-popup/add-category-popup.component';
+import { postCategory } from '../../../utils/posting_helper';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-category-list',
@@ -15,16 +19,20 @@ import { deleteCategory } from '../../../utils/deleting_helper';
     CommonModule,
     EditCategoryPopupComponent,
     DeleteCategoryPopupComponent,
+    AddCategoryPopupComponent,
   ],
 })
 export class CategoryListComponent implements OnInit {
-  constructor(private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   categories: Category[] = [];
   users: User[] = [];
+  username: string | null = '';
+  role: string | null = '';
 
   showDeletePopup: boolean = false;
   showEditPopup: boolean = false;
+  showAddCategoryPopup: boolean = false;
 
   categoryToDelete: Category | null = null;
   categoryToEdit: Category | null = null;
@@ -32,8 +40,10 @@ export class CategoryListComponent implements OnInit {
   isAdminOrModerator: boolean = false;
 
   ngOnInit(): void {
+    this.username = this.authService.getUsername();
+    this.role = this.authService.getRole();
+    this.isAdminOrModerator = this.role !== 'USER';
     fetchCategories().then((categories) => (this.categories = categories));
-    this.isAdminOrModerator = this.authService.getRole() !== 'USER';
     if (this.isAdminOrModerator)
       fetchUsers().then((users) => (this.users = users));
   }
@@ -44,10 +54,21 @@ export class CategoryListComponent implements OnInit {
   }
 
   handleConfirmEdit(updatedCategory: Category): void {
-    const index = this.categories.findIndex((c) => c.id === updatedCategory.id);
-    if (index !== -1) {
-      this.categories[index] = updatedCategory;
-    }
+    ``;
+    putCategory(
+      updatedCategory.id,
+      updatedCategory.name,
+      updatedCategory.userId
+    ).then((success) => {
+      if (success) {
+        const index = this.categories.findIndex(
+          (c) => c.id === updatedCategory.id
+        );
+        if (index !== -1) {
+          this.categories[index] = updatedCategory;
+        }
+      }
+    });
     this.showEditPopup = false;
     this.categoryToEdit = null;
   }
@@ -62,7 +83,7 @@ export class CategoryListComponent implements OnInit {
     this.showDeletePopup = true;
   }
 
-  confirmDelete(): void {
+  handleConfirmDelete(): void {
     if (!this.categoryToDelete) return;
     const toDeleteId: number = this.categoryToDelete.id;
     deleteCategory(this.categoryToDelete.id).then((success) => {
@@ -77,7 +98,28 @@ export class CategoryListComponent implements OnInit {
     this.categoryToDelete = null;
   }
 
+  handleCancelDelete(): void {
+    this.showDeletePopup = false;
+    this.categoryToDelete = null;
+  }
+
+  postNewCategory(name: string) {
+    postCategory(name).then(() => {
+      fetchCategories().then((categories) => {
+        this.categories = categories;
+      });
+    });
+  }
+
   getUsernameFromId(userId: number): string {
     return this.users.find((user) => user.id === userId)?.username || '';
+  }
+
+  logout() {
+    this.authService.logout();
+  }
+
+  goToHome() {
+    this.router.navigate(['/home']);
   }
 }

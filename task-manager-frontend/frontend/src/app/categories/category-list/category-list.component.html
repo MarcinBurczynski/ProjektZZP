@@ -36,7 +36,7 @@
         <div class="col-3">{{ category.name }}</div>
         <div class="col-3">{{ getUsernameFromId(category.userId) }}</div>
         <div class="col-3 text-right">
-          <button class="btn btn-link">
+          <button class="btn btn-link" (click)="editCategory(category)">
             <i class="fas fa-edit"></i>
           </button>
           <button class="btn btn-link">
@@ -47,3 +47,12 @@
     </div>
   </div>
 </div>
+
+<app-edit-category-popup
+  [visible]="showEditPopup"
+  [category]="categoryToEdit"
+  [users]="users"
+  [canEditUserId]="isAdminOrModerator"
+  (confirm)="handleConfirmEdit($event)"
+  (cancel)="handleCancelEdit()"
+></app-edit-category-popup>

@@ -1,0 +1,61 @@
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Category, User } from '../../../utils/interfaces';
+import { getRole } from '../../../utils/role_getter';
+
+@Component({
+  selector: 'app-edit-category-popup',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './edit-category-popup.component.html',
+  standalone: true,
+  styleUrl: './edit-category-popup.component.css'
+})
+export class EditCategoryPopupComponent implements OnChanges {
+  @Input() visible: boolean = false;
+  @Input() category: Category | null = null;
+  @Input() users: User[] = [];
+  @Input() canEditUserId: boolean = false;
+
+  @Output() confirm = new EventEmitter<Category>();
+  @Output() cancel = new EventEmitter<void>();
+
+  categoryName = '';
+  selectedUsername: string = '';
+  categoryUserId: number | null = null;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['category'] && this.category) {
+      this.categoryName = this.category.name;
+      this.categoryUserId = this.category.userId;
+      this.selectedUsername = this.getUsernameFromId(this.category.userId);
+    }
+  }
+
+  getUsernameFromId(userId: number): string {
+    const user = this.users.find((user) => user.id === userId);
+    return user ? user.username : '';
+  }
+
+  onConfirm(): void {
+    if (!this.category || this.categoryUserId == null) return;
+
+    const user = this.users.find((user) => user.username === this.selectedUsername);
+    if (!user) return;
+
+    this.confirm.emit({
+      ...this.category,
+      name: this.categoryName,
+      userId: this.canEditUserId ? user.id : this.category.userId
+    });
+
+    this.visible = false;
+  }
+
+  onCancel(): void {
+    this.cancel.emit();
+    this.visible = false;
+  }
+}
+
+

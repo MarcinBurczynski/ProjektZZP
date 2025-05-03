@@ -67,6 +67,11 @@ public class UserService implements org.springframework.security.core.userdetail
         if(permUser.getRole().ordinal()>0){
             throw new SecurityException("You can't create users!!!");
         }
+
+        userRepository.findByUsername(userOperationDTO.getUsername()).ifPresent(u ->{
+            throw new IllegalArgumentException("Given username is already taken!!!");
+        });
+
         String encodedPassword = passwordEncoder.encode(userOperationDTO.getPassword());
         User user = new User(userOperationDTO.getUsername(), encodedPassword,userOperationDTO.getEmail(), userOperationDTO.getRole());
         user = userRepository.save(user);
@@ -102,8 +107,8 @@ public class UserService implements org.springframework.security.core.userdetail
     }
 
     public void deleteUser(User permUser,Long id) {
-        if(permUser.getRole().ordinal()>0){
-            throw new SecurityException("You can't delete users!!!");
+        if(permUser.getRole().ordinal()>0 || permUser.getId().equals(id)){
+            throw new SecurityException("You can't delete this user!!!");
         }
         userRepository.deleteById(id);
     }

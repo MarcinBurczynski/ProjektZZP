@@ -56,10 +56,14 @@ public class CategoryService {
 
     @Transactional
     public CategoryDTO createCategory(User user,CategoryDTO categoryDTO) {
-        if(categoryDTO.getUserId()==null || !categoryDTO.getUserId().equals(user.getId())){
+        if(categoryDTO.getUserId()==null){
+            categoryDTO.setUserId(user.getId());
+        }
+
+        if(!categoryDTO.getUserId().equals(user.getId())){
             if(user.getRole().ordinal()>1){
                 throw new SecurityException("You can't create categories for other users!!!");
-            }else if(categoryDTO.getUserId()!=null){
+            }else{
                 user = userService.getUserObjectById(user, categoryDTO.getUserId());
             }
         }
@@ -75,10 +79,14 @@ public class CategoryService {
 
     @Transactional
     public void updateCategory(User user, CategoryDTO categoryDTO) {
-        if(categoryDTO.getUserId()==null || !categoryDTO.getUserId().equals(user.getId())){
-            if(user.getRole().ordinal()>1){
+        if(categoryDTO.getUserId()==null){
+            categoryDTO.setUserId(user.getId());
+        }
+
+        if(!categoryDTO.getUserId().equals(user.getId())) {
+            if (user.getRole().ordinal() > 1) {
                 throw new SecurityException("You can't update categories for other users!!!");
-            }else if(categoryDTO.getUserId()!=null){
+            } else {
                 user = userService.getUserObjectById(user, categoryDTO.getUserId());
             }
         }

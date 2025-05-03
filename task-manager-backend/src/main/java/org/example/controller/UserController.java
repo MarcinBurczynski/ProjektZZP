@@ -36,10 +36,10 @@ public class UserController {
     }
 
     @PostMapping
-    public void createUser(@AuthenticationPrincipal UserDetails userDetails,
+    public UserDTO createUser(@AuthenticationPrincipal UserDetails userDetails,
                            @RequestBody UserOperationDTO userOperationDTO) {
         User auth = userService.getUserFromDetails(userDetails);
-        userService.createUser(auth,userOperationDTO);
+        return userService.createUser(auth,userOperationDTO);
     }
 
     @PutMapping("/{id}")

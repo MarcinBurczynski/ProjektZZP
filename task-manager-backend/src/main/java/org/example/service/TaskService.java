@@ -105,7 +105,7 @@ public class TaskService {
 
     @Transactional
     public void deleteTask(User user, Long taskId) {
-        Task task = taskRepository.findByIdAndUser(taskId, user)
+        Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
         if (!task.getUser().getId().equals(user.getId()) && user.getRole().ordinal()>1) {

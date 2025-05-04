@@ -35,10 +35,12 @@ export class UserListComponent implements OnInit {
   showEditUserPopup: boolean = false;
   userToDelete: User | null = null;
   userToEdit: User | null = null;
+  isAdmin: boolean = false;
 
   async ngOnInit(): Promise<void> {
     this.username = this.authService.getUsername();
     this.role = this.authService.getRole();
+    this.isAdmin = this.role === 'ADMIN';
     this.users = await fetchUsers();
   }
 

@@ -62,7 +62,9 @@ export class EditUserPopupComponent {
   @Output() cancel = new EventEmitter<void>();
 
   username: string = '';
+  changePassword: boolean = false;
   password: string = '';
+  repeatPassword: string = '';
   email: string = '';
   role: string = '';
 
@@ -81,7 +83,7 @@ export class EditUserPopupComponent {
     this.confirm.emit({
       ...this.user,
       username: this.username,
-      password: this.password,
+      ...(this.password !== '' ? { password: this.password } : {}),
       email: this.email,
       role: this.role,
     });

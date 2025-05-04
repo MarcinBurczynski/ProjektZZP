@@ -71,10 +71,18 @@
           </span>
         </div>
         <div class="col-2 text-right">
-          <button class="btn btn-link" (click)="editUser(user)">
+          <button
+            class="btn btn-link"
+            [disabled]="!isAdmin"
+            (click)="editUser(user)"
+          >
             <i class="fas fa-edit"></i>
           </button>
-          <button class="btn btn-link" (click)="deleteUser(user)">
+          <button
+            class="btn btn-link"
+            [disabled]="!isAdmin"
+            (click)="deleteUser(user)"
+          >
             <i class="fas fa-trash-alt"></i>
           </button>
         </div>
@@ -86,6 +94,7 @@
   <button
     type="button"
     class="btn btn-success btn-lg"
+    *ngIf="isAdmin"
     (click)="showAddUserPopup = true"
   >
     <i class="fa fa-plus me-1"></i> Dodaj nowego

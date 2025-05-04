@@ -41,11 +41,13 @@ export class HomeComponent implements OnInit {
   showAddUserPopup: boolean = false;
 
   isAdminOrModerator: boolean = false;
+  isAdmin: boolean = false;
 
   ngOnInit() {
     this.username = this.authService.getUsername();
     this.role = this.authService.getRole();
     this.isAdminOrModerator = this.role !== 'USER';
+    this.isAdmin = this.role === 'ADMIN';
     this.userId = this.authService.getUserId();
 
     fetchCategories().then((categories) => {

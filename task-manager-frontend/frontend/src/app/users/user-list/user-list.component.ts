@@ -29,6 +29,7 @@ export class UserListComponent implements OnInit {
   users: User[] = [];
   username: string | null = '';
   role: string | null = '';
+  userId: number | null = null;
 
   showAddUserPopup: boolean = false;
   showDeleteUserPopup: boolean = false;
@@ -40,6 +41,7 @@ export class UserListComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.username = this.authService.getUsername();
     this.role = this.authService.getRole();
+    this.userId = this.authService.getUserId();
     this.isAdmin = this.role === 'ADMIN';
     this.users = await fetchUsers();
   }
@@ -59,6 +61,9 @@ export class UserListComponent implements OnInit {
       updatedUser.role
     ).then((success) => {
       if (success) {
+        if (updatedUser.id === this.userId) {
+          this.authService.logout();
+        }
         const index = this.users.findIndex((u) => u.id === updatedUser.id);
         if (index !== -1) {
           this.users[index] = updatedUser;

@@ -55,6 +55,7 @@
           id="role"
           class="form-select"
           [(ngModel)]="role"
+          [disabled]="loggedUserId === user?.id"
           name="role"
           required
           #roleInput="ngModel"

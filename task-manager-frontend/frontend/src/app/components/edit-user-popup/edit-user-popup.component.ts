@@ -6,6 +6,7 @@ import {
   OnChanges,
   SimpleChanges,
   HostListener,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +18,7 @@ import {
   query,
 } from '@angular/animations';
 import { User } from '../../../utils/interfaces';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-edit-user-popup',
@@ -54,12 +56,16 @@ import { User } from '../../../utils/interfaces';
     ]),
   ],
 })
-export class EditUserPopupComponent {
+export class EditUserPopupComponent implements OnInit {
   @Input() visible: boolean = false;
   @Input() user: User | null = null;
 
   @Output() confirm = new EventEmitter<User>();
   @Output() cancel = new EventEmitter<void>();
+
+  constructor(private authService: AuthService) {}
+
+  loggedUserId: number | null = null;
 
   username: string = '';
   changePassword: boolean = false;
@@ -67,6 +73,10 @@ export class EditUserPopupComponent {
   repeatPassword: string = '';
   email: string = '';
   role: string = '';
+
+  ngOnInit(): void {
+    this.loggedUserId = this.authService.getUserId();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['user'] && this.user) {

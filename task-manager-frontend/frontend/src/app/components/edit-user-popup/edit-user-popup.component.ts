@@ -1,13 +1,14 @@
 import {
   Component,
-  EventEmitter,
-  HostListener,
   Input,
   Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Category, User } from '../../../utils/interfaces';
 import {
   trigger,
   style,
@@ -15,13 +16,14 @@ import {
   transition,
   query,
 } from '@angular/animations';
+import { User } from '../../../utils/interfaces';
 
 @Component({
-  selector: 'app-add-task-popup',
-  templateUrl: './add-task-popup.component.html',
-  styleUrl: './add-task-popup.component.css',
-  standalone: true,
+  selector: 'app-edit-user-popup',
   imports: [CommonModule, FormsModule],
+  templateUrl: './edit-user-popup.component.html',
+  styleUrl: './edit-user-popup.component.css',
+  standalone: true,
   animations: [
     trigger('popupAnimation', [
       transition(':enter', [
@@ -52,21 +54,40 @@ import {
     ]),
   ],
 })
-export class AddTaskPopupComponent {
+export class EditUserPopupComponent {
   @Input() visible: boolean = false;
-  @Input() categories: Category[] = [];
-  @Input() users: User[] = [];
-  @Input() loggedUserId: number | null = null;
-  @Input() canEditUserId: boolean = false;
+  @Input() user: User | null = null;
 
-  @Output() confirm = new EventEmitter<any>();
+  @Output() confirm = new EventEmitter<User>();
   @Output() cancel = new EventEmitter<void>();
 
-  taskTitle: string = '';
-  taskDescription: string = '';
-  taskStatus: string = '';
-  taskCategoryId: string = '';
-  taskUserId: string = '';
+  username: string = '';
+  password: string = '';
+  email: string = '';
+  role: string = '';
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['user'] && this.user) {
+      this.username = this.user.username;
+      this.password = this.user.password;
+      this.email = this.user.email;
+      this.role = this.user.role;
+    }
+  }
+
+  onConfirm(): void {
+    if (!this.user) return;
+
+    this.confirm.emit({
+      ...this.user,
+      username: this.username,
+      password: this.password,
+      email: this.email,
+      role: this.role,
+    });
+
+    this.visible = false;
+  }
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEsc() {
@@ -80,31 +101,9 @@ export class AddTaskPopupComponent {
     }
   }
 
-  onConfirm() {
-    if (this.taskTitle.trim() && this.taskCategoryId && this.taskStatus) {
-      const newTask = {
-        title: this.taskTitle.trim(),
-        description: this.taskDescription.trim(),
-        status: this.taskStatus,
-        categoryId: this.taskCategoryId,
-        userId: this.taskUserId || this.loggedUserId,
-      };
-      this.confirm.emit(newTask);
-      this.resetForm();
-    }
-  }
-
-  onCancel() {
+  onCancel(): void {
     this.cancel.emit();
-    this.resetForm();
-  }
-
-  private resetForm() {
-    this.taskTitle = '';
-    this.taskDescription = '';
-    this.taskStatus = '';
-    this.taskCategoryId = '';
-    this.taskUserId = '';
+    this.visible = false;
   }
 
   close(callback?: () => void) {

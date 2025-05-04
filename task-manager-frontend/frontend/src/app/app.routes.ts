@@ -4,6 +4,7 @@ import { LoginComponent } from './login/login.component';
 import { AuthGuard } from './auth/auth.guard';
 import { CategoryListComponent } from './categories/category-list/category-list.component';
 import { TaskListComponent } from './tasks/task-list/task-list.component';
+import { UserListComponent } from './users/user-list/user-list.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -14,4 +15,10 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   { path: 'tasks', component: TaskListComponent, canActivate: [AuthGuard] },
+  {
+    path: 'users',
+    component: UserListComponent,
+    canActivate: [AuthGuard],
+    data: { rolesAllowed: ['ADMIN', 'MODERATOR'] },
+  },
 ];

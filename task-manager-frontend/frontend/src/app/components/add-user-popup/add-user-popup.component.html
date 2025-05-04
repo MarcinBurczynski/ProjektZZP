@@ -1,0 +1,138 @@
+<div
+  *ngIf="visible"
+  [@popupAnimation]
+  class="popup-overlay"
+  (click)="onOverlayClick($event)"
+>
+  <div class="popup-content">
+    <h5 class="text-center mb-4">Dodaj nowego użytkownika</h5>
+
+    <form (ngSubmit)="onConfirm()">
+      <div class="form-floating mb-3">
+        <input
+          type="text"
+          id="username"
+          class="form-control"
+          [(ngModel)]="username"
+          name="username"
+          placeholder="Nazwa użytkownika"
+          maxlength="255"
+          required
+          #usernameInput="ngModel"
+        />
+        <label for="taskTitle">Nazwa użytkownika</label>
+        <div
+          *ngIf="usernameInput.invalid && usernameInput.touched"
+          class="text-danger"
+        >
+          Nazwa użytkownika jest wymagana.
+        </div>
+      </div>
+
+      <div class="form-floating mb-3">
+        <input
+          type="email"
+          id="email"
+          class="form-control"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="E-Mail"
+          maxlength="255"
+          required
+          #emailInput="ngModel"
+        />
+        <label for="taskDescription">E-Mail</label>
+        <div
+          *ngIf="emailInput.invalid && emailInput.touched"
+          class="text-danger"
+        >
+          Adres E-Mail jest wymagany.
+        </div>
+      </div>
+
+      <div class="form-floating mb-3">
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Hasło"
+          maxlength="255"
+          required
+          #passwordInput="ngModel"
+        />
+        <label for="password">Hasło</label>
+        <div
+          *ngIf="passwordInput.invalid && passwordInput.touched"
+          class="text-danger"
+        >
+          Hasło jest wymagane.
+        </div>
+      </div>
+
+      <div class="form-floating mb-3">
+        <input
+          type="password"
+          id="repeat-password"
+          class="form-control"
+          [(ngModel)]="repeatPassword"
+          name="repeat-password"
+          placeholder="Powtórz hasło"
+          maxlength="255"
+          required
+          #passwordRepeatInput="ngModel"
+        />
+        <label for="repeat-password">Powtórz hasło</label>
+        <div
+          *ngIf="
+            passwordRepeatInput.touched &&
+            passwordInput.value !== passwordRepeatInput.value
+          "
+          class="text-danger"
+        >
+          Hasła muszą być takie same!
+        </div>
+      </div>
+
+      <div class="form-floating mb-3">
+        <select
+          id="role"
+          class="form-select"
+          [(ngModel)]="role"
+          name="role"
+          required
+          #roleInput="ngModel"
+        >
+          <option value="" disabled selected>Wybierz rolę</option>
+          <option value="ADMIN">ADMINISTRATOR</option>
+          <option value="MODERATOR">MODERATOR</option>
+          <option value="USER">UŻYTKOWNIK</option>
+        </select>
+        <label for="taskStatus">Rola</label>
+        <div *ngIf="roleInput.invalid && roleInput.touched" class="text-danger">
+          Podanie roli jest wymagane.
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end mt-4 gap-2">
+        <button
+          type="submit"
+          class="btn btn-success"
+          [disabled]="
+            !username ||
+            !role ||
+            !email ||
+            !password ||
+            password !== repeatPassword
+          "
+        >
+          <i class="fa fa-check me-1"></i> Zatwierdź
+        </button>
+        <button type="button" class="btn btn-danger" (click)="onCancel()">
+          <i class="fa fa-xmark me-1"></i> Anuluj
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

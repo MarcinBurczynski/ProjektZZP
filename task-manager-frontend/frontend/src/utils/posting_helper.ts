@@ -52,7 +52,7 @@ export async function postUser(
   username: string,
   password: string,
   email: string,
-  role: number
+  role: string
 ): Promise<boolean> {
   try {
     const response = await apiClient.post('/api/users', {

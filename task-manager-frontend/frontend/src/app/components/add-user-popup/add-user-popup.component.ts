@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Category, User } from '../../../utils/interfaces';
 import {
   trigger,
   style,
@@ -17,11 +16,11 @@ import {
 } from '@angular/animations';
 
 @Component({
-  selector: 'app-add-task-popup',
-  templateUrl: './add-task-popup.component.html',
-  styleUrl: './add-task-popup.component.css',
-  standalone: true,
+  selector: 'app-add-user-popup',
   imports: [CommonModule, FormsModule],
+  templateUrl: './add-user-popup.component.html',
+  styleUrl: './add-user-popup.component.css',
+  standalone: true,
   animations: [
     trigger('popupAnimation', [
       transition(':enter', [
@@ -52,21 +51,35 @@ import {
     ]),
   ],
 })
-export class AddTaskPopupComponent {
+export class AddUserPopupComponent {
   @Input() visible: boolean = false;
-  @Input() categories: Category[] = [];
-  @Input() users: User[] = [];
-  @Input() loggedUserId: number | null = null;
-  @Input() canEditUserId: boolean = false;
 
   @Output() confirm = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<void>();
 
-  taskTitle: string = '';
-  taskDescription: string = '';
-  taskStatus: string = '';
-  taskCategoryId: string = '';
-  taskUserId: string = '';
+  username: string = '';
+  password: string = '';
+  repeatPassword: string = '';
+  email: string = '';
+  role: string = '';
+
+  onConfirm() {
+    if (
+      this.username.trim() &&
+      this.password.trim() &&
+      this.email.trim() &&
+      this.role.trim()
+    ) {
+      const newUser = {
+        username: this.username.trim(),
+        password: this.password.trim(),
+        email: this.email.trim(),
+        role: this.role.trim(),
+      };
+      this.confirm.emit(newUser);
+      this.resetForm();
+    }
+  }
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEsc() {
@@ -80,31 +93,17 @@ export class AddTaskPopupComponent {
     }
   }
 
-  onConfirm() {
-    if (this.taskTitle.trim() && this.taskCategoryId && this.taskStatus) {
-      const newTask = {
-        title: this.taskTitle.trim(),
-        description: this.taskDescription.trim(),
-        status: this.taskStatus,
-        categoryId: this.taskCategoryId,
-        userId: this.taskUserId || this.loggedUserId,
-      };
-      this.confirm.emit(newTask);
-      this.resetForm();
-    }
-  }
-
   onCancel() {
     this.cancel.emit();
     this.resetForm();
   }
 
   private resetForm() {
-    this.taskTitle = '';
-    this.taskDescription = '';
-    this.taskStatus = '';
-    this.taskCategoryId = '';
-    this.taskUserId = '';
+    this.username = '';
+    this.password = '';
+    this.repeatPassword = '';
+    this.email = '';
+    this.role = '';
   }
 
   close(callback?: () => void) {

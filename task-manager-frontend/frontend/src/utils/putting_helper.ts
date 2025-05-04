@@ -55,7 +55,7 @@ export async function putUser(
   username: string,
   password: string,
   email: string,
-  role: number
+  role: string
 ): Promise<boolean> {
   try {
     const response = await apiClient.put('/api/users/' + userId, {

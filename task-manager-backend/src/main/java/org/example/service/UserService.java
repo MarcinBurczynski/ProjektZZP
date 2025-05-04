@@ -98,9 +98,12 @@ public class UserService implements org.springframework.security.core.userdetail
         }
         User user = optionalUser.get();
 
-        String encodedPassword = passwordEncoder.encode(userOperationDTO.getPassword());
+        if(userOperationDTO.getPassword()!=null) {
+            String encodedPassword = passwordEncoder.encode(userOperationDTO.getPassword());
+            user.setPassword(encodedPassword);
+        }
+
         user.setUsername(userOperationDTO.getUsername());
-        user.setPassword(encodedPassword);
         user.setEmail(userOperationDTO.getEmail());
         user.setRole(userOperationDTO.getRole());
         userRepository.save(user);

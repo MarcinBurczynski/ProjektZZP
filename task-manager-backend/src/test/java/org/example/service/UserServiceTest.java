@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,6 +26,9 @@ class UserServiceTest {
     @Mock
     private EmailService emailService;
 
+    @Mock
+    private JwtUtils jwtUtils;
+
     @InjectMocks
     private UserService userService;
 
@@ -33,10 +37,10 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    @Spy
-    private BCryptPasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Test
     void createUser_adminCreatesUser_returnsUserDTO() {
@@ -56,6 +60,230 @@ class UserServiceTest {
         assertEquals(newUser.getUsername(), result.getUsername());
         assertEquals(newUser.getEmail(), result.getEmail());
         assertEquals(newUser.getRole(), result.getRole());
+    }
+
+    @Test
+    void register_newUser_returnsPermissionDTO() {
+        User newUser = new User("user", "password", "user@example.com", Role.USER);
+        newUser.setId(1L);
+
+        when(userRepository.findByUsername("user")).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenReturn(newUser);
+
+        UserOperationDTO dto = new UserOperationDTO(newUser);
+        PermissionDTO result = userService.register(dto);
+
+        assertEquals("USER", result.getRole());
+        assertNotNull(result.getJwt());
+        assertFalse(result.getJwt().isEmpty());
+    }
+
+//    @Test
+//    void login_validCredentials_returnsPermissionDTO() {
+//        String rawPassword = "password";
+//        String encodedPassword = passwordEncoder.encode(rawPassword);
+//
+//        User existingUser = new User("user", encodedPassword, "user@example.com", Role.USER);
+//        existingUser.setId(1L);
+//
+//        when(userRepository.findByUsername("user")).thenReturn(Optional.of(existingUser));
+//        when(jwtUtils.generateToken(existingUser)).thenReturn("mocked.jwt.token");
+//
+//        UserOperationDTO dto = new UserOperationDTO(existingUser);
+//
+//        PermissionDTO result = userService.login(dto);
+//
+//        assertEquals("USER", result.getRole());
+//        assertNotNull(result.getJwt());
+//        assertFalse(result.getJwt().isEmpty());
+//    }
+    @Test
+    void login_validCredentials_returnsPermissionDTO() {
+        String rawPassword = "password";
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+
+        User existingUser = new User("user", encodedPassword, "user@example.com", Role.USER);
+        existingUser.setId(1L);
+
+        when(userRepository.findByUsername("user")).thenReturn(Optional.of(existingUser));
+        when(jwtUtils.generateToken(existingUser)).thenReturn("mocked.jwt.token");
+
+        UserOperationDTO dto = new UserOperationDTO();
+        dto.setUsername("user");
+        dto.setPassword(rawPassword);
+
+        PermissionDTO result = userService.login(dto);
+
+        assertEquals("USER", result.getRole());
+        assertNotNull(result.getJwt());
+        assertFalse(result.getJwt().isEmpty());
+    }
+
+    @Test
+    void updateUser_validUpdate_updatesUser() {
+        User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
+        admin.setId(1L);
+
+        User data = new User("updatedUser", "newpass", "updated@example.com", Role.USER);
+        data.setId(2L);
+        UserOperationDTO dto = new UserOperationDTO(data);
+
+        User userFromDb = new User("user", passwordEncoder.encode("oldpass"), "user@example.com", Role.USER);
+        userFromDb.setId(2L);
+
+        when(userRepository.findById(2L)).thenReturn(Optional.of(userFromDb));
+        when(userRepository.findByUsername("updatedUser")).thenReturn(Optional.empty()); // Ensure no conflict here
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+
+        userService.updateUser(admin, dto);
+
+        verify(userRepository).save(argThat(updatedUser ->
+                updatedUser.getUsername().equals("updatedUser") &&
+                        updatedUser.getEmail().equals("updated@example.com") &&
+                        passwordEncoder.matches("newpass", updatedUser.getPassword()) &&
+                        updatedUser.getRole() == Role.USER
+        ));
+    }
+
+    @Test
+    void deleteUser_asAdmin_deletesAnotherUser() {
+        User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
+        admin.setId(1L);
+
+        Long idToDelete = 2L;
+
+        userService.deleteUser(admin, idToDelete);
+
+        verify(userRepository).deleteById(idToDelete);
+    }
+
+    @Test
+    void deleteUser_userTriesToDeleteSelf_throwsSecurityException() {
+        User user = new User("user", "", "user@example.com", Role.USER);
+        user.setId(2L);
+
+        assertThrows(SecurityException.class, () -> {
+            userService.deleteUser(user, 2L);
+        });
+
+        verify(userRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void deleteUser_moderatorTriesToDeleteUser_throwsSecurityException() {
+        User moderator = new User("mod", "", "mod@example.com", Role.MODERATOR);
+        moderator.setId(1L);
+
+        assertThrows(SecurityException.class, () -> {
+            userService.deleteUser(moderator, 3L);
+        });
+
+        verify(userRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void getUserById_asAdmin_returnsUserDTO() {
+        User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
+        admin.setId(1L);
+
+        User user = new User("user", "", "user@example.com", Role.USER);
+        user.setId(2L);
+
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user));
+
+        UserDTO result = userService.getUserById(admin, 2L);
+
+        assertEquals("user", result.getUsername());
+        assertEquals("user@example.com", result.getEmail());
+        assertEquals(Role.USER, result.getRole());
+    }
+
+    @Test
+    void getUserById_userTriesToAccessOtherUser_throwsSecurityException() {
+        User user = new User("user", "", "user@example.com", Role.USER);
+        user.setId(2L);
+
+        assertThrows(SecurityException.class, () -> {
+            userService.getUserById(user, 3L);
+        });
+    }
+
+    @Test
+    void getUserObjectById_userGetsOwnData_returnsUser() {
+        User user = new User("user", "", "user@example.com", Role.USER);
+        user.setId(2L);
+
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user));
+
+        User result = userService.getUserObjectById(user, 2L);
+
+        assertEquals("user", result.getUsername());
+    }
+
+    @Test
+    void getUserObjectById_adminGetsOtherUser_returnsUser() {
+        User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
+        admin.setId(1L);
+
+        User otherUser = new User("other", "", "other@example.com", Role.USER);
+        otherUser.setId(2L);
+
+        when(userRepository.findById(2L)).thenReturn(Optional.of(otherUser));
+
+        User result = userService.getUserObjectById(admin, 2L);
+
+        assertEquals("other", result.getUsername());
+    }
+
+    @Test
+    void getUserObjectById_userTriesToGetOtherUser_throwsSecurityException() {
+        User user = new User("user", "", "user@example.com", Role.USER);
+        user.setId(2L);
+
+        assertThrows(SecurityException.class, () -> {
+            userService.getUserObjectById(user, 3L);
+        });
+    }
+
+    @Test
+    void getUserObjectById_userNotFound_throwsIllegalArgumentException() {
+        User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
+        admin.setId(1L);
+
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            userService.getUserObjectById(admin, 99L);
+        });
+    }
+
+    @Test
+    void getUsers_adminCanViewUsers_returnsListOfUserDTOs() {
+        User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
+        admin.setId(1L);
+
+        List<User> users = List.of(
+                new User("user1", "", "u1@example.com", Role.USER),
+                new User("user2", "", "u2@example.com", Role.MODERATOR)
+        );
+
+        when(userRepository.findAll()).thenReturn(users);
+
+        List<UserDTO> result = userService.getUsers(admin);
+
+        assertEquals(2, result.size());
+        assertEquals("user1", result.get(0).getUsername());
+        assertEquals("user2", result.get(1).getUsername());
+    }
+
+    @Test
+    void getUsers_userCannotViewUsers_throwsSecurityException() {
+        User user = new User("user", "", "user@example.com", Role.USER);
+        user.setId(2L);
+
+        assertThrows(SecurityException.class, () -> {
+            userService.getUsers(user);
+        });
     }
 
 }

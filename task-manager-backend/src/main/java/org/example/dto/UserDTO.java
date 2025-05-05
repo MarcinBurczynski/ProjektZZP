@@ -9,6 +9,9 @@ public class UserDTO {
     private String email;
     private String role;
 
+    public UserDTO() {
+    }
+
     public UserDTO(User u) {
         this.id = u.getId();
         this.username = u.getUsername();
@@ -31,4 +34,10 @@ public class UserDTO {
     public String getEmail() {
         return email;
     }
+
+    public void setUsername(String username) { this.username = username; }
+
+    public void setEmail(String email) { this.email = email; }
+
+    public void setRole(String role) { this.role = role;}
 }

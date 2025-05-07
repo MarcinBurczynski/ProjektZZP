@@ -63,6 +63,39 @@ class UserServiceTest {
     }
 
     @Test
+    void createUser_nonAdminUser_throwsSecurityException() {
+        User nonAdmin = new User("user", "", "user@example.com", Role.USER);
+        nonAdmin.setId(2L);
+
+        UserOperationDTO dto = new UserOperationDTO();
+        dto.setUsername("newuser");
+        dto.setPassword("password123");
+        dto.setEmail("newuser@example.com");
+        dto.setRole(Role.USER);
+
+        assertThrows(SecurityException.class, () -> userService.createUser(nonAdmin, dto));
+    }
+
+    @Test
+    void createUser_existingUsername_throwsIllegalArgumentException() {
+        User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
+        admin.setId(1L);
+
+        User existingUser = new User("existing", "", "existing@example.com", Role.USER);
+        existingUser.setId(3L);
+
+        UserOperationDTO dto = new UserOperationDTO();
+        dto.setUsername("existing");
+        dto.setPassword("password123");
+        dto.setEmail("duplicate@example.com");
+        dto.setRole(Role.USER);
+
+        when(userRepository.findByUsername("existing")).thenReturn(Optional.of(existingUser));
+
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(admin, dto));
+    }
+
+    @Test
     void register_newUser_returnsPermissionDTO() {
         User newUser = new User("user", "password", "user@example.com", Role.USER);
         newUser.setId(1L);
@@ -78,25 +111,18 @@ class UserServiceTest {
         assertFalse(result.getJwt().isEmpty());
     }
 
-//    @Test
-//    void login_validCredentials_returnsPermissionDTO() {
-//        String rawPassword = "password";
-//        String encodedPassword = passwordEncoder.encode(rawPassword);
-//
-//        User existingUser = new User("user", encodedPassword, "user@example.com", Role.USER);
-//        existingUser.setId(1L);
-//
-//        when(userRepository.findByUsername("user")).thenReturn(Optional.of(existingUser));
-//        when(jwtUtils.generateToken(existingUser)).thenReturn("mocked.jwt.token");
-//
-//        UserOperationDTO dto = new UserOperationDTO(existingUser);
-//
-//        PermissionDTO result = userService.login(dto);
-//
-//        assertEquals("USER", result.getRole());
-//        assertNotNull(result.getJwt());
-//        assertFalse(result.getJwt().isEmpty());
-//    }
+    @Test
+    void register_existingUsername_throwsRuntimeException() {
+        User existing = new User("user", "pass", "user@example.com", Role.USER);
+        when(userRepository.findByUsername("user")).thenReturn(Optional.of(existing));
+
+        UserOperationDTO dto = new UserOperationDTO(existing);
+
+        assertThrows(RuntimeException.class, () -> {
+            userService.register(dto);
+        });
+    }
+
     @Test
     void login_validCredentials_returnsPermissionDTO() {
         String rawPassword = "password";
@@ -118,6 +144,40 @@ class UserServiceTest {
         assertNotNull(result.getJwt());
         assertFalse(result.getJwt().isEmpty());
     }
+
+    @Test
+    void login_invalidPassword_throwsRuntimeException() {
+        String rawPassword = "wrongPassword";
+        String encodedPassword = new BCryptPasswordEncoder().encode("correctPassword");
+
+        User user = new User("user", encodedPassword, "user@example.com", Role.USER);
+        user.setId(1L);
+
+        when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
+
+        UserOperationDTO dto = new UserOperationDTO();
+        dto.setUsername("user");
+        dto.setPassword(rawPassword);
+
+        assertThrows(RuntimeException.class, () -> {
+            userService.login(dto);
+        });
+    }
+
+    @Test
+    void login_userNotFound_throwsException() {
+        String rawPassword = "password";
+        when(userRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
+
+        UserOperationDTO dto = new UserOperationDTO();
+        dto.setUsername("user");
+        dto.setPassword(rawPassword);
+
+        assertThrows(RuntimeException.class, () -> {
+            userService.login(dto);
+        });
+    }
+
 
     @Test
     void updateUser_validUpdate_updatesUser() {
@@ -143,6 +203,56 @@ class UserServiceTest {
                         passwordEncoder.matches("newpass", updatedUser.getPassword()) &&
                         updatedUser.getRole() == Role.USER
         ));
+    }
+
+    @Test
+    void updateUser_userTriesToUpdateAnotherUser_throwsSecurityException() {
+        User user = new User("user", "", "user@example.com", Role.USER);
+        user.setId(1L);
+
+        UserOperationDTO dto = new UserOperationDTO();
+        dto.setId(2L);
+        dto.setUsername("newname");
+        dto.setEmail("new@example.com");
+        dto.setPassword("pass");
+        dto.setRole(Role.USER);
+
+        assertThrows(SecurityException.class, () -> userService.updateUser(user, dto));
+    }
+
+    @Test
+    void updateUser_userTriesToChangeOwnRole_throwsSecurityException() {
+        User user = new User("user", "", "user@example.com", Role.USER);
+        user.setId(2L);
+
+        UserOperationDTO dto = new UserOperationDTO();
+        dto.setId(2L);
+        dto.setUsername("user");
+        dto.setEmail("user@example.com");
+        dto.setPassword("pass");
+        dto.setRole(Role.ADMIN); // próba podniesienia roli
+
+        assertThrows(SecurityException.class, () -> userService.updateUser(user, dto));
+    }
+
+    @Test
+    void updateUser_usernameAlreadyTaken_throwsIllegalArgumentException() {
+        User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
+        admin.setId(1L);
+
+        User existing = new User("taken", "", "taken@example.com", Role.USER);
+        existing.setId(3L);
+
+        UserOperationDTO dto = new UserOperationDTO();
+        dto.setId(2L);
+        dto.setUsername("taken"); // próba nadpisania czyjegoś username
+        dto.setEmail("new@example.com");
+        dto.setPassword("pass");
+        dto.setRole(Role.USER);
+
+        when(userRepository.findByUsername("taken")).thenReturn(Optional.of(existing));
+
+        assertThrows(IllegalArgumentException.class, () -> userService.updateUser(admin, dto));
     }
 
     @Test

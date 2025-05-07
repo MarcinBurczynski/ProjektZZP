@@ -61,6 +61,23 @@ class TaskServiceTest {
     }
 
     @Test
+    void getTasksByIdAndUser_shouldThrowSecurityExceptionWhenAccessingOthersTask() {
+        User requester = createUser(1L, Role.USER);
+
+        User owner = createUser(2L, Role.USER);
+        Task task = createTask(1L, owner);
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+
+        SecurityException exception = assertThrows(SecurityException.class, () -> {
+            taskService.getTasksByIdAndUser(requester, 1L);
+        });
+
+        assertEquals("You don't have access to this task", exception.getMessage());
+    }
+
+
+    @Test
     void getTasksForUser_shouldReturnOwnTasksForRegularUser() {
         User user = createUser(1L, Role.USER);
         List<Task> tasks = List.of(createTask(1L, user));
@@ -104,6 +121,40 @@ class TaskServiceTest {
     }
 
     @Test
+    void createTask_shouldSetUserIdToCurrentUserIfNull() {
+        User user = createUser(1L, Role.USER);
+
+        TaskDTO dto = new TaskDTO(null, "Test", "Test", "NEW", 1L, null);
+
+        Category category = new Category();
+        category.setId(1L);
+
+        when(categoryService.getCategoryObjectByIdAndUser(user, 1L)).thenReturn(category);
+        when(taskRepository.save(any())).thenAnswer(i -> {
+            Task t = i.getArgument(0);
+            t.setId(1L);
+            return t;
+        });
+
+        TaskDTO result = taskService.createTask(user, dto);
+
+        assertEquals(user.getId(), result.getUserId());
+        verify(taskRepository).save(any(Task.class));
+    }
+
+    @Test
+    void shouldThrowSecurityException_whenUserIsNotAdminAndTriesToCreateTaskForAnotherUser() {
+        User user = new User();
+        user.setId(1L);
+        user.setRole(Role.USER);
+
+        TaskDTO taskDTO = new TaskDTO();
+        taskDTO.setUserId(2L);
+
+        assertThrows(SecurityException.class, () -> taskService.createTask(user, taskDTO));
+    }
+
+    @Test
     void updateTask_shouldUpdateTaskForSelf() {
         User user = createUser(1L, Role.USER);
         Task task = createTask(1L, user);
@@ -116,6 +167,42 @@ class TaskServiceTest {
 
         assertEquals("Updated", task.getTitle());
         verify(taskRepository).save(task);
+    }
+
+    @Test
+    void updateTask_shouldSetUserIdToCurrentUserIfNull() {
+        User user = createUser(1L, Role.USER);
+
+        TaskDTO dto = new TaskDTO(1L, "Updated Title", "Updated Description", "IN_PROGRESS", null, null); // userId is null
+
+        Category category = new Category();
+        category.setId(1L);
+
+        when(categoryService.getCategoryObjectByIdAndUser(user, 1L)).thenReturn(category);
+        when(taskRepository.findByIdAndUser(1L, user)).thenReturn(Optional.of(new Task()));
+        when(taskRepository.save(any())).thenAnswer(i -> {
+            Task t = i.getArgument(0);
+            t.setId(1L);
+            return t;
+        });
+
+        taskService.updateTask(user, dto);
+
+        assertEquals(user.getId(), dto.getUserId());
+        verify(taskRepository).save(any(Task.class));
+    }
+
+    @Test
+    void shouldThrowSecurityException_whenUserIsNotAdminAndTriesToUpdateOtherUsersTask() {
+        User user = new User();
+        user.setId(1L);
+        user.setRole(Role.USER);
+
+        TaskDTO taskDTO = new TaskDTO();
+        taskDTO.setId(100L);
+        taskDTO.setUserId(2L);
+
+        assertThrows(SecurityException.class, () -> taskService.updateTask(user, taskDTO));
     }
 
     @Test

@@ -116,6 +116,41 @@ class CategoryServiceTest {
     }
 
     @Test
+    void getCategoriesForUser_adminSeesAllCategory() {
+        CategoryDTO dto1 = new CategoryDTO();
+        CategoryDTO dto2 = new CategoryDTO();
+        dto1.setName("Sport");
+        dto2.setName("Travel");
+
+        when(categoryRepository.findByUserAndName(user, "Sport")).thenReturn(Optional.empty());
+        when(categoryRepository.findByUserAndName(admin, "Travel")).thenReturn(Optional.empty());
+        when(categoryRepository.save(any(Category.class))).thenAnswer(inv -> {
+            Category c = inv.getArgument(0);
+            if (c.getName().equals("Sport")) {
+                c.setId(200L);
+            } else if (c.getName().equals("Travel")) {
+                c.setId(201L);
+            }
+            return c;
+        });
+
+        categoryService.createCategory(user, dto1);
+        categoryService.createCategory(admin, dto2);
+
+        Category savedCategory1 = new Category("Sport", user);
+        Category savedCategory2 = new Category("Travel", admin);
+        when(categoryRepository.findAll()).thenReturn(List.of(savedCategory1,savedCategory2));
+
+        List<CategoryDTO> categories = categoryService.getCategoriesForUser(admin);
+
+        assertEquals(2, categories.size());
+        assertEquals("Sport", categories.get(0).getName());
+        assertEquals(user.getId(), categories.get(0).getUserId());
+        assertEquals("Travel", categories.get(1).getName());
+        assertEquals(admin.getId(), categories.get(1).getUserId());
+    }
+
+    @Test
     void getCategoryByIdAndUser_returnsCategoryDTO() {
         Category savedCategory = new Category("Food", user);
         savedCategory.setId(300L);

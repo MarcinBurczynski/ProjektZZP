@@ -256,6 +256,25 @@ class UserServiceTest {
     }
 
     @Test
+    void updateUser_userNotFound_throwsRuntimeException() {
+        User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
+        admin.setId(1L);
+
+        UserOperationDTO dto = new UserOperationDTO();
+        dto.setId(2L);
+        dto.setUsername("newname");
+        dto.setEmail("new@example.com");
+        dto.setPassword("pass");
+        dto.setRole(Role.USER);
+
+        when(userRepository.findByUsername("newname")).thenReturn(Optional.empty());
+        when(userRepository.findById(2L)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.updateUser(admin, dto));
+        assertEquals("User not found", exception.getMessage());
+    }
+
+    @Test
     void deleteUser_asAdmin_deletesAnotherUser() {
         User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
         admin.setId(1L);

@@ -121,6 +121,33 @@ class TaskServiceTest {
     }
 
     @Test
+    void createTask_asAdmin_createsTaskForOtherUser() {
+        User admin = createUser(1L, Role.ADMIN);
+        Long targetUserId = 2L;
+
+        TaskDTO dto = new TaskDTO(null, "AdminTask", "Desc", "NEW", 1L, targetUserId);
+
+        User otherUser = createUser(targetUserId, Role.USER);
+        Category category = new Category();
+        category.setId(1L);
+
+        when(userService.getUserObjectById(admin, targetUserId)).thenReturn(otherUser);
+        when(categoryService.getCategoryObjectByIdAndUser(otherUser, 1L)).thenReturn(category);
+        when(taskRepository.save(any())).thenAnswer(invocation -> {
+            Task task = invocation.getArgument(0);
+            task.setId(10L);
+            return task;
+        });
+
+        TaskDTO result = taskService.createTask(admin, dto);
+
+        assertEquals("AdminTask", result.getTitle());
+        assertEquals(targetUserId, result.getUserId());
+        verify(userService).getUserObjectById(admin, targetUserId);
+        verify(taskRepository).save(any(Task.class));
+    }
+
+    @Test
     void createTask_shouldSetUserIdToCurrentUserIfNull() {
         User user = createUser(1L, Role.USER);
 
@@ -190,6 +217,34 @@ class TaskServiceTest {
 
         assertEquals(user.getId(), dto.getUserId());
         verify(taskRepository).save(any(Task.class));
+    }
+
+    @Test
+    void updateTask_asAdmin_shouldUpdateTaskForOtherUser() {
+        User admin = createUser(1L, Role.ADMIN);
+        Long targetUserId = 2L;
+
+        TaskDTO dto = new TaskDTO(1L, "Admin Updated", "Updated Desc", "IN_PROGRESS", 1L, targetUserId);
+
+        User otherUser = createUser(targetUserId, Role.USER);
+        Category category = new Category();
+        category.setId(1L);
+
+        Task existingTask = createTask(1L, otherUser);
+        existingTask.setCategory(category);
+
+        when(userService.getUserObjectById(admin, targetUserId)).thenReturn(otherUser);
+        when(taskRepository.findByIdAndUser(1L, otherUser)).thenReturn(Optional.of(existingTask));
+        when(categoryService.getCategoryObjectByIdAndUser(otherUser, 1L)).thenReturn(category);
+
+        taskService.updateTask(admin, dto);
+
+        assertEquals("Admin Updated", existingTask.getTitle());
+        assertEquals("Updated Desc", existingTask.getDescription());
+        assertEquals(otherUser, existingTask.getUser());
+
+        verify(userService).getUserObjectById(admin, targetUserId);
+        verify(taskRepository).save(existingTask);
     }
 
     @Test

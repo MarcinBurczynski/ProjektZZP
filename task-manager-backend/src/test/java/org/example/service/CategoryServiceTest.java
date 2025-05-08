@@ -61,6 +61,35 @@ class CategoryServiceTest {
     }
 
     @Test
+    void createCategory_asAdmin_createsCategoryForOtherUser() {
+        User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
+        admin.setId(1L);
+
+        User otherUser = new User("user", "", "user@example.com", Role.USER);
+        otherUser.setId(2L);
+
+        CategoryDTO dto = new CategoryDTO();
+        dto.setName("Tech");
+        dto.setUserId(2L);
+
+        when(userService.getUserObjectById(admin, 2L)).thenReturn(otherUser);
+        when(categoryRepository.findByUserAndName(otherUser, "Tech")).thenReturn(Optional.empty());
+        when(categoryRepository.save(any(Category.class))).thenAnswer(i -> {
+            Category c = i.getArgument(0);
+            c.setId(101L);
+            return c;
+        });
+
+        CategoryDTO result = categoryService.createCategory(admin, dto);
+
+        assertEquals("Tech", result.getName());
+        assertEquals(2L, result.getUserId());
+        verify(userService).getUserObjectById(admin, 2L);
+        verify(categoryRepository).save(any(Category.class));
+    }
+
+
+    @Test
     void createCategory_asUser_createCategoryForOtherUser_throwsSecurityException() {
         User user = new User("user", "", "user@example.com", Role.USER);
         user.setId(1L);
@@ -267,6 +296,35 @@ class CategoryServiceTest {
                 cat.getId().equals(14L) &&
                         cat.getName().equals("NewName") &&
                         cat.getUser().equals(user)
+        ));
+    }
+
+    @Test
+    void updateCategory_asAdmin_updatesOtherUsersCategory() {
+        User admin = new User("admin", "", "admin@example.com", Role.ADMIN);
+        admin.setId(1L);
+
+        User otherUser = new User("other", "", "other@example.com", Role.USER);
+        otherUser.setId(2L);
+
+        Category existing = new Category("OldName", otherUser);
+        existing.setId(15L);
+
+        CategoryDTO dto = new CategoryDTO(existing);
+        dto.setName("NewName");
+        dto.setUserId(2L);
+
+        when(userService.getUserObjectById(admin, 2L)).thenReturn(otherUser);
+        when(categoryRepository.findById(15L)).thenReturn(Optional.of(existing));
+        when(categoryRepository.findByUserIdAndName(2L, "NewName")).thenReturn(Optional.empty());
+
+        categoryService.updateCategory(admin, dto);
+
+        verify(userService).getUserObjectById(admin, 2L);
+        verify(categoryRepository).save(argThat(cat ->
+                cat.getId().equals(15L) &&
+                        cat.getName().equals("NewName") &&
+                        cat.getUser().equals(otherUser)
         ));
     }
 

@@ -1,6 +1,7 @@
 package org.example.service;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.example.dto.CategoryDTO;
 import org.example.entity.Category;
 import org.example.entity.User;
@@ -11,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Service
 @Validated
 public class CategoryService {

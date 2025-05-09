@@ -1,5 +1,6 @@
 package org.example.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.config.JwtUtils;
 import org.example.dto.PermissionDTO;
 import org.example.dto.UserDTO;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @Service
 public class UserService implements org.springframework.security.core.userdetails.UserDetailsService{
     private final UserRepository userRepository;

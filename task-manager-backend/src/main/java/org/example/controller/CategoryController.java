@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.dto.CategoryDTO;
 import org.example.entity.User;
 import org.example.service.CategoryService;
@@ -10,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {

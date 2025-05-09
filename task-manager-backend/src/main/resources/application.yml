@@ -27,3 +27,11 @@ spring:
             enable: true
 server:
   port: 8080
+
+logging:
+  file:
+    name: logs/app.log
+  level:
+    root: OFF                 # Spring + third-party libs: WARN and ERROR only
+    org.example.config.RequestLogFilter: INFO
+    org.example.config.ServiceExceptionLoggingAspect: INFO

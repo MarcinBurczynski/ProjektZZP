@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.dto.PermissionDTO;
 import org.example.dto.UserOperationDTO;
 import org.example.entity.Role;
@@ -9,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
+@Slf4j
 @RestController
 public class PublicUserController {
 

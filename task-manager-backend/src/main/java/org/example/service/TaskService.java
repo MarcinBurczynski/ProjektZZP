@@ -1,6 +1,7 @@
 package org.example.service;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.example.dto.TaskDTO;
 import org.example.entity.Category;
 import org.example.entity.Task;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;

@@ -27,6 +27,7 @@ export class LoginComponent {
   loginUsername: string = '';
   loginPassword: string = '';
   registerUsername: string = '';
+  registerEmail: string = '';
   registerPassword: string = '';
   registerPasswordConfirmation: string = '';
   showError: boolean = false;
@@ -70,6 +71,7 @@ export class LoginComponent {
   async register() {
     if (
       !this.registerUsername ||
+      !this.registerEmail ||
       !this.registerPassword ||
       !this.registerPasswordConfirmation
     ) {
@@ -82,9 +84,11 @@ export class LoginComponent {
       const response = await apiClient.post('/register', {
         username: this.registerUsername,
         password: this.registerPassword,
+        email: this.registerEmail,
       });
       if (response.status === 200) {
         this.router.navigate(['/']);
+        this.isRegistering = false;
       }
       if (response.status === 201) {
         this.isRegistering = false;

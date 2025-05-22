@@ -1,20 +1,48 @@
-<div class="d-flex flex-column justify-content-center align-items-center vh-100">
+<div
+  class="d-flex flex-column justify-content-center align-items-center vh-100"
+>
   <div class="container d-flex justify-content-center align-items-center">
-    <div 
-      class="card p-4 shadow-lg border-3" 
-      style="width: 100%; max-width: 400px; overflow: hidden; border-width: 3px; border-style: solid;">
+    <div
+      class="card p-4 shadow-lg border-3"
+      style="
+        width: 100%;
+        max-width: 400px;
+        overflow: hidden;
+        border-width: 3px;
+        border-style: solid;
+      "
+    >
       <div class="text-center mb-3">
-        <img src="taskero_logo.png" alt="Logo Taskero" style="max-width: 100px; height: auto;">
+        <img
+          src="taskero_logo.png"
+          alt="Logo Taskero"
+          style="max-width: 100px; height: auto"
+        />
       </div>
 
       <div class="text-center mb-3">
         <h2 class="fw-bold">Taskero</h2>
       </div>
 
-      <div class="mb-3" style="border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
+      <div
+        class="mb-3"
+        style="border-top: 1px solid #ccc; border-bottom: 1px solid #ccc"
+      >
         <div class="d-flex">
-          <button class="btn flex-fill card-tab" [class.active-tab]="!isRegistering" (click)="isRegistering = false">Logowanie</button>
-          <button class="btn flex-fill card-tab" [class.active-tab]="isRegistering" (click)="isRegistering = true">Rejestracja</button>
+          <button
+            class="btn flex-fill card-tab"
+            [class.active-tab]="!isRegistering"
+            (click)="isRegistering = false"
+          >
+            Logowanie
+          </button>
+          <button
+            class="btn flex-fill card-tab"
+            [class.active-tab]="isRegistering"
+            (click)="isRegistering = true"
+          >
+            Rejestracja
+          </button>
         </div>
       </div>
 
@@ -33,7 +61,10 @@
                 required
                 #usernameInput="ngModel"
               />
-              <div *ngIf="usernameInput.invalid && usernameInput.touched" class="text-danger">
+              <div
+                *ngIf="usernameInput.invalid && usernameInput.touched"
+                class="text-danger"
+              >
                 Nazwa użytkownika jest wymagana.
               </div>
             </div>
@@ -48,11 +79,18 @@
                 required
                 #passwordInput="ngModel"
               />
-              <div *ngIf="passwordInput.invalid && passwordInput.touched" class="text-danger">
+              <div
+                *ngIf="passwordInput.invalid && passwordInput.touched"
+                class="text-danger"
+              >
                 Hasło jest wymagane.
               </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm.invalid">
+            <button
+              type="submit"
+              class="btn btn-primary w-100"
+              [disabled]="loginForm.invalid"
+            >
               Zaloguj
             </button>
           </form>
@@ -62,7 +100,9 @@
           <h3 class="text-primary text-center mb-4">Zarejestruj się!</h3>
           <form (ngSubmit)="register()" #registerForm="ngForm">
             <div class="mb-3">
-              <label for="reg-username" class="form-label">Nazwa użytkownika</label>
+              <label for="reg-username" class="form-label"
+                >Nazwa użytkownika</label
+              >
               <input
                 type="text"
                 id="reg-username"
@@ -72,8 +112,29 @@
                 required
                 #regUsernameInput="ngModel"
               />
-              <div *ngIf="regUsernameInput.invalid && regUsernameInput.touched" class="text-danger">
+              <div
+                *ngIf="regUsernameInput.invalid && regUsernameInput.touched"
+                class="text-danger"
+              >
                 Nazwa użytkownika jest wymagana.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="reg-email" class="form-label">Adres E-Mail</label>
+              <input
+                type="text"
+                id="reg-email"
+                class="form-control"
+                name="reg-email"
+                [(ngModel)]="registerEmail"
+                required
+                #regEmailInput="ngModel"
+              />
+              <div
+                *ngIf="regEmailInput.invalid && regEmailInput.touched"
+                class="text-danger"
+              >
+                Adres E-Mail jest wymagany.
               </div>
             </div>
             <div class="mb-3">
@@ -87,12 +148,17 @@
                 required
                 #regPasswordInput="ngModel"
               />
-              <div *ngIf="regPasswordInput.invalid && regPasswordInput.touched" class="text-danger">
+              <div
+                *ngIf="regPasswordInput.invalid && regPasswordInput.touched"
+                class="text-danger"
+              >
                 Hasło jest wymagane.
               </div>
             </div>
             <div class="mb-3">
-              <label for="reg-password" class="form-label">Potwierdź Hasło</label>
+              <label for="reg-password" class="form-label"
+                >Potwierdź Hasło</label
+              >
               <input
                 type="password"
                 id="reg-password"
@@ -102,14 +168,30 @@
                 required
                 #regPasswordConfirmationInput="ngModel"
               />
-              <div *ngIf="regPasswordConfirmationInput.invalid && regPasswordConfirmationInput.touched" class="text-danger">
+              <div
+                *ngIf="
+                  regPasswordConfirmationInput.invalid &&
+                  regPasswordConfirmationInput.touched
+                "
+                class="text-danger"
+              >
                 Hasło jest wymagane.
               </div>
-              <div *ngIf="registerPassword !== registerPasswordConfirmation" class="text-danger">
+              <div
+                *ngIf="registerPassword !== registerPasswordConfirmation"
+                class="text-danger"
+              >
                 Hasła muszą być takie same!
               </div>
             </div>
-            <button type="submit" class="btn btn-success w-100" [disabled]="registerForm.invalid || registerPassword !== registerPasswordConfirmation">
+            <button
+              type="submit"
+              class="btn btn-success w-100"
+              [disabled]="
+                registerForm.invalid ||
+                registerPassword !== registerPasswordConfirmation
+              "
+            >
               Zarejestruj
             </button>
           </form>
@@ -118,7 +200,7 @@
     </div>
   </div>
 
-  <div *ngIf="showError" class="modal" style="display: block;">
+  <div *ngIf="showError" class="modal" style="display: block">
     <div class="modal-content">
       <span class="close" (click)="closeModal()">&times;</span>
       <p>{{ errorMessage }}</p>
